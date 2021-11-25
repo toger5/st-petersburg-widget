@@ -1,0 +1,39 @@
+.field{
+    background-color: rgb(248, 248, 248);
+    flex-direction: column;
+    padding: 10px;
+    display: flex;
+    margin: 10px;
+}
+.playerArea{
+    font-size: small;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 10px auto;
+}
+.playerArea div{
+    margin: 3px;
+    padding: 5px;
+    border-width: 2px;
+    background-color: rgb(240, 240, 240);
+}
+.playerArea div.current {
+    border-width: 2px;
+    border-color: hotpink;
+    border-style: solid
+}
+.card{
+    flex-grow: 1;
+    aspect-ratio: 0.61;
+    /* background-color: rgb(252, 252, 252); */
+    border-color: red;
+    border-width: 2px;
+    border-radius: 4px;
+    box-shadow: 0 0 7px rgb(160, 160, 160);
+    padding: 0px;
+    margin: 5px;
+}
+.card.image{
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
