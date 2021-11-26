@@ -98,7 +98,7 @@ function PlayerBox(props) {
     let isCurrent = curP.matrixId == p.matrixId;
     let idLabel = p.matrixId;
     let cardSelector = props.cardSelector;
-    if (curP.matrixId == p.matrixId) {
+    if (p.matrixId == props.thisPlayerMatrixId) {
         idLabel = <>You: <b>{idLabel}</b></>;
     }
     let handCards = createCardIdArray(p.handCards, p.handSize, false);
@@ -180,6 +180,7 @@ class GameField extends Component {
                             key={p.matrixId}
                             player={p}
                             currentPlayer={curP}
+                            thisPlayerMatrixId={this.props.userId}
                             gs={gs}
                             onCardBuy={onCardBuy?.bind(this)}
                             onCardActivate={onCardActivate?.bind(this)}
