@@ -39,7 +39,8 @@ try {
         // }).then((val) => { console.log("after send evetn: ", val) })
         // api.readRoomEvents("m.room.message",100).then((val)=>{console.log("SOMETHING READ",val)})
         let a = document.getElementById("root");
-        ReactDOM.render(<App widgetApi={api} userId={userId} />, a);
+        window.app = <App widgetApi={api} userId={userId} widgetId={widgetId}/>;
+        ReactDOM.render(window.app, a);
     });
 
     api.start();

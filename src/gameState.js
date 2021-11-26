@@ -1,10 +1,12 @@
 import { Cards, CardCategory } from "./cards";
 import * as Helper from "./helper"
-import * as InitialCards from "./cardIndex"
+import * as CardIndex from "./cardIndex"
 export class GameState {
-    constructor(playerCount) {
-        if (playerCount === undefined) return;
+    constructor(playerIds) {
+        if (playerIds === undefined) return;
         // Init Players
+        let playerCount = playerIds.length;
+        if (playerCount < 2) { console.error("too little players"); }
         let startPhases = [CardCategory.Worker, CardCategory.Building, CardCategory.Aristocrat, CardCategory.Exchange];
         let randomStartPhases = Helper.shuffle(startPhases);
         let phaseChunksPerPlayer = new Map();
@@ -15,7 +17,7 @@ export class GameState {
         let startPhaseForPlayer = Helper.splitIntoChunks(randomStartPhases, phaseChunksPerPlayer.get(playerCount))
 
         for (let i = 0; i < playerCount; i++) {
-            let p = new Player(startPhaseForPlayer[i])
+            let p = new Player(startPhaseForPlayer[i], playerIds[i])
             this.players.push(p)
         }
         this.currentPlayerIndex = this.getBeginningPlayerIndexForPhase(CardCategory.Worker)
@@ -30,40 +32,64 @@ export class GameState {
     fieldTop = [];
     fieldBottom = [];
     cards = {
-        [CardCategory.Worker]: InitialCards.INITIAL_WORKER,
-        [CardCategory.Building]: InitialCards.INITIAL_BUILDINGS,
-        [CardCategory.Aristocrat]: InitialCards.INITIAL_ARISTOCRATS,
-        [CardCategory.Exchange]: InitialCards.INITIAL_EXCHANGE,
+        [CardCategory.Worker]: CardIndex.INITIAL_WORKER,
+        [CardCategory.Building]: CardIndex.INITIAL_BUILDINGS,
+        [CardCategory.Aristocrat]: CardIndex.INITIAL_ARISTOCRATS,
+        [CardCategory.Exchange]: CardIndex.INITIAL_EXCHANGE,
     };
     turns = [];
-
+    isFinished = false;
     getBeginningPlayerIndexForPhase(phase) {
         return this.players.indexOf(this.players.find(p => (p.startPhases.includes(phase))));
     }
     drawCardsForNewPhase(initial) {
         // Todo Make random determined by seeds
         // todo add checks for end of game
-        let drawAmount = initial ? this.players.length * 2 : 8 - this.fieldTop.length;
+        if (this.phase == CardCategory.Worker) {
+            this.fieldBottom = this.fieldTop;
+            this.fieldTop = [];
+        }
+        let drawAmount = initial ? this.players.length * 2 : 8 - (this.fieldTop.length + this.fieldBottom.length);
         let [newDeck, drawnCards] = Helper.randomFromArray(this.cards[this.phase], drawAmount);
         this.cards[this.phase] = newDeck;
-        this.fieldBottom = this.fieldTop;
-        this.fieldTop = drawnCards;
+
+        this.fieldTop = drawnCards.concat(this.fieldTop);
+
     }
+
     nextPlayer() {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+    }
+
+    removeCardFromGame(cardId) {
+        let rmCard = c => (c !== cardId);
+        this.fieldTop = this.fieldTop.filter(rmCard);
+        this.fieldBottom = this.fieldBottom.filter(rmCard);
+        for (let p of this.players) {
+            p.handCards = p.handCards.filter(rmCard);
+            p.field = p.field.filter(rmCard);
+        }
     }
 
     // Public
     getCurrentPlayer() {
         return this.players[this.currentPlayerIndex]
     }
+
     nextPhase() {
-        for (let p of this.players) {
-            p.phaseEvalutation(this)
+        for (const p of this.players) {
+            p.phaseEvalutation(this);
         }
         this.phase = (this.phase + 1) % 4;
-        this.drawCardsForNewPhase(false)
-        this.currentPlayer = this.getBeginningPlayerIndexForPhase(this.phase);
+        if (this.phase == CardCategory.Worker) {
+            let prevStartPhases = this.players.map(p => Array.from(p.startPhases))
+            for (const [i, p] of this.players.entries()) {
+                p.disabledCards = [];
+                p.startPhases = prevStartPhases[(i + 1) % this.players.length]
+            }
+        }
+        this.drawCardsForNewPhase(false);
+        this.currentPlayerIndex = this.getBeginningPlayerIndexForPhase(this.phase);
     }
 
     nextStateAfterTurn(turn) {
@@ -84,36 +110,60 @@ export class GameState {
                 if (newPhase) {
                     turn.nextPhase = true;
                     this.nextPhase();
-                } else
+                } else {
                     this.nextPlayer();
+                }
 
                 break;
             }
             case TurnType.TakeCard: {
-                this.getCurrentPlayer().handcards.push(turn.card);
+                this.removeCardFromGame(turn.cardId);
+                this.getCurrentPlayer().handCards.push(turn.cardId);
                 this.nextPlayer();
+                break;
             }
             case TurnType.BuyCard: {
-                let playerCards = this.getCurrentPlayer().field;
-                // discount from dublicate cards
-                let discount = playerCards.filter(c => c == turn.card).length;
-                // discount from other cards
-                let buyCard = Cards[turn.card];
-                discount += playerCards.filter(c => Cards[c].discount == buyCard.category).length;
-                let price = Math.min(buyCard.price - discount, 1)
-                console.log("Buying card, cost:", buyCard.price, " for:", price, " with discount:", discount)
-                this.getCurrentPlayer().money -= price;
-                this.getCurrentPlayer().field.push(turn.card);
+                // let playerCards = this.getCurrentPlayer().field;
+                // // discount from dublicate cards
+                // let discount = playerCards.filter(c => Cards.byId(c).type == Cards.byId(turn.cardId).type).length;
+                // // discount from other cards
+                // let buyCard = Cards.byId(turn.cardId);
+                // discount += playerCards.filter(c => Cards.byId(c).discountCategory == buyCard.category).length;
+                // let price = Math.max(buyCard.price - discount, 1)
+                // console.log("Buying card, cost:", buyCard.price, " for:", price, " with discount:", discount)
+                const curP = this.getCurrentPlayer();
+                let price = curP.minPriceForCard(turn.cardId, this);
+                this.removeCardFromGame(turn.cardId);
+                if (turn.exchangeCardId !== undefined) {
+                    // window.app
+                    this.removeCardFromGame(turn.exchangeCardId);
+                    price = curP.priceForExchangeCard(turn.cardId, this, turn.exchangeCardId);
+                }
+                curP.field.push(turn.cardId);
+                curP.money -= price;
                 this.nextPlayer();
+                break;
             }
             case TurnType.ActivateCard: {
-                let card = Cards[turn.card];
+                let card = Cards.byId(turn.cardId);
+                if (!card.activate) { console.log("could not activate card: ", card); return; }
+
                 card.activate();
-                this.getCurrentPlayer().disabledCards.push(turn.card);
+                this.getCurrentPlayer().disabledCards.push(turn.cardId);
                 this.nextPlayer();
+                break;
             }
         }
         this.turns.push(turn);
+    }
+    isCancelled() {
+        let isFinished = this.isFinished
+        let oneStackEmpty = false;
+        for (let i = 0; i < 4; i++) {
+            oneStackEmpty = this.cards[i].length == 0
+        }
+        let phaseIsExchange = this.phase == CardCategory.Exchange;
+        return !(isFinished && oneStackEmpty && phaseIsExchange);
     }
 }
 export const TurnType = {
@@ -124,21 +174,29 @@ export const TurnType = {
 }
 class Turn {
     type = "";
-    card = "";
+    cardId = "";
+    exchangeCardId = "";
 }
 export class Player {
-    constructor(startPhases) {
+    constructor(startPhases, matrixId) {
         this.startPhases = startPhases;
+        this.matrixId = matrixId
     }
     matrixId = "@id:server.domain"
     money = 25;
     points = 0;
     handCards = [];
-    handSize = 3;
+    get handSize() { return this.field.map(c => Cards.byId(c).type).includes(CardIndex.CardType.WareHouse) ? 4 : 3 };
     field = [];
     startPhases = [];
+    disabledCards = []
     phaseEvalutation(gameState) {
-        let cardsToEvaluate = this.field.map((cardType) => { return Cards[cardType] }).filter((card) => { return card.category === gameState.phase })
+        if(gameState.phase == CardCategory.Exchange) return;
+        let cardsToEvaluate = this.field
+            .map((cardId) => { return Cards.byId(cardId) })
+            .filter((card) => {
+                return card.category === gameState.phase || card.upgradeCategory === gameState.phase
+            });
         let m = 0;
         let p = 0;
         for (let c of cardsToEvaluate) {
@@ -148,6 +206,98 @@ export class Player {
         this.money += m;
         this.points += p;
     }
+    canTakeCard(cardId, gs) {
+        if (Cards.byId(cardId) == undefined) return false;
+        // check if card  if on one of the field
+        let cardsPossibleToTake = gs.fieldBottom.concat(gs.fieldTop);
+        let cardIsOnAccessibleField = cardsPossibleToTake.includes(cardId);
+
+        // check if there is enough space in the player hand
+        let handHasSpace = this.handCards.length < this.handSize;
+
+        return cardIsOnAccessibleField && handHasSpace;
+    }
+
+    canBuyCard(cardId, gs, exchangeId) {
+        if (Cards.byId(cardId) == undefined) return false;
+        // check if card  if on one of the field
+        let cardsPossibleToBuy = gs.fieldBottom.concat(gs.fieldTop).concat(this.handCards);
+        let cardIsOnAccessibleField = cardsPossibleToBuy.includes(cardId);
+
+        // check if card can be afforded
+        let enoughMoney = this.money >= this.minPriceForCard(cardId, gs)
+
+        let exchangeCardValid = true;
+        let canBeExchanged = true;
+        if (Cards.byId(cardId).category == CardCategory.Exchange) {
+            let posExchanges = this.getPossibleUpgradesForCard(cardId);
+
+            // is exchange card valid
+            canBeExchanged = (exchangeId === undefined)
+                ? posExchanges.length > 0
+                : posExchanges.includes(exchangeId)
+            // check if card can be afforded with the specific exchange card
+            enoughMoney = (exchangeId === undefined)
+                ? enoughMoney
+                : this.money >= this.priceForExchangeCard(cardId, gs, exchangeId)
+        }
+        return cardIsOnAccessibleField && enoughMoney && exchangeCardValid && canBeExchanged;
+
+    }
+    canActivateCard(cardId, gs) {
+        if (Cards.byId(cardId) == undefined) return false;
+        // check if card  if on one of the field
+        let cardIsOnAccessibleField = this.field.includes(cardId);
+
+        // check if card has action
+        let card = Cards.byId(cardId);
+        let hasAction = !!card.action;
+
+        // check if card is deactivated
+        let cardIsNotDeactivated = !this.disabledCards.includes(cardId);
+        return cardIsOnAccessibleField && hasAction && cardIsNotDeactivated;
+    }
+    getPossibleUpgradesForCard(cardId) {
+        let card = Cards.byId(cardId);
+        if (card.category == CardCategory.Exchange) {
+            if (card.upgradeCategory == CardCategory.Worker) {
+                return this.field.filter(c => card.upgradeCards.includes(Cards.byId(c).type));
+            } else {
+                return this.field.filter(c => (card.upgradeCategory == Cards.byId(c).category));
+            }
+        }
+        return [];
+    }
+    discountsForCard(cardId, gs) {
+        // discount from dublicate cards
+        let discount = this.field.filter(c => Cards.byId(c)?.type == Cards.byId(cardId)?.type).length;
+
+        // discount from other cards
+        let buyCard = Cards.byId(cardId);
+        discount += this.field.filter(c => Cards.byId(c).discountCategory == buyCard.category).length;
+
+        // discount from fieldBottom
+        discount += gs.fieldBottom.includes(cardId) ? 1 : 0;
+        return discount
+    }
+    priceForExchangeCard(cardId, gs, exchangeId) {
+        let discountTotal = Cards.byId(exchangeId).price + this.discountsForCard(cardId, gs);
+        let price = Math.max(Cards.byId(cardId).price - discountTotal, 1)
+        return price;
+    }
+    minPriceForCard(cardId, gs) {
+
+        let discount = this.discountsForCard(cardId, gs);
+        let buyCard = Cards.byId(cardId);
+        if (buyCard.category == CardCategory.Exchange) {
+            let exchangeOptions = this.getPossibleUpgradesForCard(cardId);
+            let cheapestToUpgradeCardId = exchangeOptions.sort((a, b) => Cards.byId(b).price - Cards.byId(a).price)[0]
+            discount += Cards.byId(cheapestToUpgradeCardId)?.price || 0;
+        }
+        let price = Math.max(buyCard.price - discount, 1)
+        return price;
+    }
+
 }
 
 export function getGameState(turns, initialGameState) {

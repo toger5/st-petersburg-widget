@@ -1,73 +1,21 @@
-export const CardType = {
-    Lumberack: 0,
-    Goldminer: 1,
-    Sheperd: 2,
-    FurTrapper: 3,
-    ShipBuilder: 4,
-    CzarAndCarpenter: 5,
+import { CARDS, CardType } from "./cardIndex";
 
-    Market: 6,
-    CustomsHouse: 7,
-    Firehouse: 8,
-    Hospital: 9,
-    Library: 10,
-    Theater: 11,
-    Academy: 12,
-    PotemkinViallage: 13,
-    Pub: 14,
-    WareHouse: 15,
-    Observatory: 16,
-
-    Author: 17,
-    Administrator: 18,
-    WarehouseManager: 19,
-    Secratary: 20,
-    Controller: 21,
-    Judge: 22,
-    MistressOfCeremonies: 23,
-
-    CarpenterWorkshop: 24,
-    GoldSmelter: 25,
-    WeavingMill: 26,
-    FurShop: 27,
-    Wharf: 28,
-    Bank: 29,
-    Peterhof: 30,
-    StIsaacsCathedral: 31,
-    MarinksyTheater: 32,
-    ChurchOfTheResurrection: 33,
-    Harbor: 34,
-    CathedralOfTheGreatPalace: 35,
-    SmolnyCathedral: 36,
-    Hermitage: 37,
-    WinterPalace: 38,
-    Abbot: 39,
-    WeaponMaster: 40,
-    ChamberMaid: 41,
-    Builder: 42,
-    Senator: 43,
-    Patriarch: 44,
-    Taxman: 45,
-    Admiral: 46,
-    MinisterOfForeignAffairs: 47,
-    Czarin: 48,
-}
 export const CardCategory = {
     Worker:0,
     Building: 1,
     Aristocrat: 2,
     Exchange: 3,
 }
-export const INITIAL_WORKER = []
-export const Cards = new Map();
 
-// {
-//     cost:;
-//     points:;
-//     category:;
-//     activate:;
-// }
-Cards.set(CardType.Lumberack, {
+export const Cards = {
+    byId: (id) => cardsByType.get(CARDS[id]),
+    byType: (type) => cardsByType.get(type),
+}
+
+const cardsByType = new Map();
+
+
+cardsByType.set(CardType.Lumberack, {
 	type: CardType.Lumberack,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_lumberjack_EN.jpg",
     price:3,
@@ -76,7 +24,7 @@ Cards.set(CardType.Lumberack, {
     category:CardCategory.Worker,
 });
 
-Cards.set(CardType.Goldminer, {
+cardsByType.set(CardType.Goldminer, {
 	type: CardType.Goldminer,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_goldminer_EN.jpg",
     price:4,
@@ -85,7 +33,7 @@ Cards.set(CardType.Goldminer, {
     category:CardCategory.Worker,
 });
 
-Cards.set(CardType.Sheperd, {
+cardsByType.set(CardType.Sheperd, {
 	type: CardType.Sheperd,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_shepherd_EN.jpg",
     price:5,
@@ -94,7 +42,7 @@ Cards.set(CardType.Sheperd, {
     category:CardCategory.Worker,
 });
 
-Cards.set(CardType.FurTrapper, {
+cardsByType.set(CardType.FurTrapper, {
 	type: CardType.FurTrapper,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_fur_trapper_EN.jpg",
     price:6,
@@ -103,7 +51,7 @@ Cards.set(CardType.FurTrapper, {
     category:CardCategory.Worker,
 });
 
-Cards.set(CardType.ShipBuilder, {
+cardsByType.set(CardType.ShipBuilder, {
 	type: CardType.ShipBuilder,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_ship_builder_apple_EN.jpg",
     price:7,
@@ -112,7 +60,7 @@ Cards.set(CardType.ShipBuilder, {
     category:CardCategory.Worker,
 });
 
-Cards.set(CardType.CzarAndCarpenter, {
+cardsByType.set(CardType.CzarAndCarpenter, {
 	type: CardType.CzarAndCarpenter,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_czar_EN.jpg",
     price:8,
@@ -121,7 +69,7 @@ Cards.set(CardType.CzarAndCarpenter, {
     category:CardCategory.Worker,
 });
 
-Cards.set(CardType.Market, {
+cardsByType.set(CardType.Market, {
 	type: CardType.Market,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_market_fish_EN.jpg",
     price:5,
@@ -130,7 +78,7 @@ Cards.set(CardType.Market, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.CustomsHouse, {
+cardsByType.set(CardType.CustomsHouse, {
 	type: CardType.CustomsHouse,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_customs_house_EN.jpg",
     price:8,
@@ -139,7 +87,7 @@ Cards.set(CardType.CustomsHouse, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Firehouse, {
+cardsByType.set(CardType.Firehouse, {
 	type: CardType.Firehouse,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_firehouse_EN.jpg",
     price:11,
@@ -148,7 +96,7 @@ Cards.set(CardType.Firehouse, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Hospital, {
+cardsByType.set(CardType.Hospital, {
 	type: CardType.Hospital,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_hospital_EN.jpg",
     price:14,
@@ -157,7 +105,7 @@ Cards.set(CardType.Hospital, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Library, {
+cardsByType.set(CardType.Library, {
 	type: CardType.Library,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_library_EN.jpg",
     price:17,
@@ -166,7 +114,7 @@ Cards.set(CardType.Library, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Theater, {
+cardsByType.set(CardType.Theater, {
 	type: CardType.Theater,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_theater_EN.jpg",
     price:20,
@@ -175,7 +123,7 @@ Cards.set(CardType.Theater, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Academy, {
+cardsByType.set(CardType.Academy, {
 	type: CardType.Academy,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_academy_EN.jpg",
     price:23,
@@ -184,7 +132,7 @@ Cards.set(CardType.Academy, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.PotemkinViallage, {
+cardsByType.set(CardType.PotemkinViallage, {
 	type: CardType.PotemkinViallage,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_potemkin_2_6_EN.jpg",
     price:2,
@@ -193,7 +141,7 @@ Cards.set(CardType.PotemkinViallage, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Pub, {
+cardsByType.set(CardType.Pub, {
 	type: CardType.Pub,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_pub_EN.jpg",
     price:1,
@@ -203,7 +151,7 @@ Cards.set(CardType.Pub, {
     action: ()=>{console.log("Pub activated")}
 });
 
-Cards.set(CardType.WareHouse, {
+cardsByType.set(CardType.WareHouse, {
 	type: CardType.WareHouse,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_warehouse_EN.jpg",
     price:2,
@@ -212,7 +160,7 @@ Cards.set(CardType.WareHouse, {
     category:CardCategory.Building,
 });
 
-Cards.set(CardType.Observatory, {
+cardsByType.set(CardType.Observatory, {
 	type: CardType.Observatory,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_observatory_EN.jpg",
     price:7,
@@ -222,7 +170,7 @@ Cards.set(CardType.Observatory, {
     action: ()=>{console.log("Observatory activated")}
 });
 
-Cards.set(CardType.Author, {
+cardsByType.set(CardType.Author, {
 	type: CardType.Author,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_author_EN.jpg",
     price:4,
@@ -231,7 +179,7 @@ Cards.set(CardType.Author, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Administrator, {
+cardsByType.set(CardType.Administrator, {
 	type: CardType.Administrator,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_administrator_EN.jpg",
     price:7,
@@ -240,7 +188,7 @@ Cards.set(CardType.Administrator, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.WarehouseManager, {
+cardsByType.set(CardType.WarehouseManager, {
 	type: CardType.WarehouseManager,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_warehouse_manager_EN.jpg",
     price:10,
@@ -249,7 +197,7 @@ Cards.set(CardType.WarehouseManager, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Secratary, {
+cardsByType.set(CardType.Secratary, {
 	type: CardType.Secratary,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_secretary_EN.jpg",
     price:12,
@@ -258,7 +206,7 @@ Cards.set(CardType.Secratary, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Controller, {
+cardsByType.set(CardType.Controller, {
 	type: CardType.Controller,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_controller_EN.jpg",
     price:14,
@@ -267,7 +215,7 @@ Cards.set(CardType.Controller, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Judge, {
+cardsByType.set(CardType.Judge, {
 	type: CardType.Judge,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_judge_EN.jpg",
     price:17,
@@ -276,7 +224,7 @@ Cards.set(CardType.Judge, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.MistressOfCeremonies, {
+cardsByType.set(CardType.MistressOfCeremonies, {
 	type: CardType.MistressOfCeremonies,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/aristocrat_mistress_EN.jpg",
     price:20,
@@ -285,254 +233,259 @@ Cards.set(CardType.MistressOfCeremonies, {
     category: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.CarpenterWorkshop, {
+cardsByType.set(CardType.CarpenterWorkshop, {
 	type: CardType.CarpenterWorkshop,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_carpenter_EN.jpg",
     price:4,
     points:0,
     money:3,
     category: CardCategory.Exchange,
-    upgrades: [CardType.Lumberack, CardType.CzarAndCarpenter],
-    discount: [CardType.Building],
+    upgradeCategory: CardCategory.Worker,
+    upgradeCards: [CardType.Lumberack, CardType.CzarAndCarpenter],
+    discountCategory: [CardType.Building],
 });
 
-Cards.set(CardType.GoldSmelter, {
+cardsByType.set(CardType.GoldSmelter, {
 	type: CardType.GoldSmelter,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_gold_smelter_EN.jpg",
     price:6,
     points:0,
     money:3,
     category: CardCategory.Exchange,
-    upgrades: [CardType.Goldminer, CardType.CzarAndCarpenter],
-    discount: [CardType.Aristocrat],
+    upgradeCategory: CardCategory.Worker,
+    upgradeCards: [CardType.Goldminer, CardType.CzarAndCarpenter],
+    discountCategory: [CardType.Aristocrat],
 });
 
-Cards.set(CardType.WeavingMill, {
+cardsByType.set(CardType.WeavingMill, {
 	type: CardType.WeavingMill,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_weaving_mill_EN.jpg",
     price:8,
     points:0,
     money:6,
     category: CardCategory.Exchange,
-    upgrades: [CardType.Sheperd, CardType.CzarAndCarpenter],
+    upgradeCategory: CardCategory.Worker,
+    upgradeCards: [CardType.Sheperd, CardType.CzarAndCarpenter],
 });
 
-Cards.set(CardType.FurShop, {
+cardsByType.set(CardType.FurShop, {
 	type: CardType.FurShop,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_fur_shop_EN.jpg",
     price:10,
     points:2,
     money:3,
     category: CardCategory.Exchange,
-    upgrades: [CardType.FurTrapper, CardType.CzarAndCarpenter],
+    upgradeCategory: CardCategory.Worker,
+    upgradeCards: [CardType.FurTrapper, CardType.CzarAndCarpenter],
 });
 
-Cards.set(CardType.Wharf, {
+cardsByType.set(CardType.Wharf, {
 	type: CardType.Wharf,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_wharf_EN.jpg",
     price:12,
     points:1,
     money:6,
     category: CardCategory.Exchange,
-    upgrades: [CardType.ShipBuilder, CardType.CzarAndCarpenter],
+    upgradeCategory: CardCategory.Worker,
+    upgradeCards: [CardType.ShipBuilder, CardType.CzarAndCarpenter],
 });
 
-Cards.set(CardType.Bank, {
+cardsByType.set(CardType.Bank, {
 	type: CardType.Bank,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_bank_EN.jpg",
     price:13,
     points:1,
     money:5,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.Peterhof, {
+cardsByType.set(CardType.Peterhof, {
 	type: CardType.Peterhof,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_peterhof_EN.jpg",
     price:14,
     points:4,
     money:2,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.StIsaacsCathedral, {
+cardsByType.set(CardType.StIsaacsCathedral, {
 	type: CardType.StIsaacsCathedral,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_cathedral_EN.jpg",
     price:15,
     points:3,
     money:3,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.MarinksyTheater, {
+cardsByType.set(CardType.MarinksyTheater, {
 	type: CardType.MarinksyTheater,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_marinsky_EN.jpg",
     price:15,
     points:(gameState)=>{return 5},
     money:0,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.ChurchOfTheResurrection, {
+cardsByType.set(CardType.ChurchOfTheResurrection, {
 	type: CardType.ChurchOfTheResurrection,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_church_EN.jpg",
     price:16,
     points:4,
     money:2,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.Harbor, {
+cardsByType.set(CardType.Harbor, {
 	type: CardType.Harbor,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_harbor_EN.jpg",
     price:16,
     points:2,
     money:5,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.CathedralOfTheGreatPalace, {
+cardsByType.set(CardType.CathedralOfTheGreatPalace, {
 	type: CardType.CathedralOfTheGreatPalace,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_catherine_EN.jpg",
     price:17,
     points:5,
     money:1,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.SmolnyCathedral, {
+cardsByType.set(CardType.SmolnyCathedral, {
 	type: CardType.SmolnyCathedral,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_smolny_EN.jpg",
     price:17,
     points:3,
     money:4,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.Hermitage, {
+cardsByType.set(CardType.Hermitage, {
 	type: CardType.Hermitage,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_hermitage_EN.jpg",
     price:18,
     points:4,
     money:3,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.WinterPalace, {
+cardsByType.set(CardType.WinterPalace, {
 	type: CardType.WinterPalace,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_winter_palace_EN.jpg",
     price:19,
     points:5,
     money:2,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Building],
+    upgradeCategory: CardCategory.Building,
 });
 
-Cards.set(CardType.Abbot, {
+cardsByType.set(CardType.Abbot, {
 	type: CardType.Abbot,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_abbot_EN.jpg",
     price:6,
     points:1,
     money:1,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.WeaponMaster, {
+cardsByType.set(CardType.WeaponMaster, {
 	type: CardType.WeaponMaster,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_weapon_master_EN.jpg",
     price:8,
     points:0,
     money:4,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.ChamberMaid, {
+cardsByType.set(CardType.ChamberMaid, {
 	type: CardType.ChamberMaid,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_chamber_maid_EN.jpg",
     price:8,
     points:2,
     money:0,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Builder, {
+cardsByType.set(CardType.Builder, {
 	type: CardType.Builder,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_builder_EN.jpg",
     price:10,
     points:0,
     money:5,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Senator, {
+cardsByType.set(CardType.Senator, {
 	type: CardType.Senator,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_senator_EN.jpg",
     price:12,
     points:2,
     money:2,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Patriarch, {
+cardsByType.set(CardType.Patriarch, {
 	type: CardType.Patriarch,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_patriarch_EN.jpg",
     price:16,
     points:4,
     money:0,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Taxman, {
+cardsByType.set(CardType.Taxman, {
 	type: CardType.Taxman,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_tax_man_EN.jpg",
     price:17,
     points:0,
     money:(gameState)=>{return 10;},
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Admiral, {
+cardsByType.set(CardType.Admiral, {
 	type: CardType.Admiral,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_admiral_EN.jpg",
     price:18,
     points:3,
     money:3,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.MinisterOfForeignAffairs, {
+cardsByType.set(CardType.MinisterOfForeignAffairs, {
 	type: CardType.MinisterOfForeignAffairs,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_minister_EN.jpg",
     price:20,
     points:4,
     money:2,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });
 
-Cards.set(CardType.Czarin, {
+cardsByType.set(CardType.Czarin, {
 	type: CardType.Czarin,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_czarina_EN.jpg",
     price:24,
     points:6,
     money:0,
     category: CardCategory.Exchange,
-    upgrades: [CardCategory.Aristocrat],
+    upgradeCategory: CardCategory.Aristocrat,
 });

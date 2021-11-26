@@ -1,11 +1,59 @@
-import { CardType } from "./cards"
 
-// cardId: CardType
-export const CARDS = INDEX_WORKER.concat(INDEX_BUILDINGS).concat(INDEX_ARISTOCRATS).concat(INDEX_EXCHANGE);
-export const INITIAL_WORKER = CARDS.keys().slice(0,INDEX_WORKER.length)
-export const INITIAL_BUILDINGS = CARDS.keys().slice(INDEX_WORKER.length, INDEX_WORKER.length + INDEX_BUILDINGS.length)
-export const INITIAL_ARISTOCRATS = CARDS.keys().slice(INDEX_WORKER.length + INDEX_BUILDINGS.length, INDEX_WORKER.length + INDEX_BUILDINGS.length + INDEX_ARISTOCRATS.length)
-export const INITIAL_EXCHANGE = CARDS.keys().slice(INDEX_WORKER.length + INDEX_BUILDINGS.length + INDEX_ARISTOCRATS.length, INDEX_WORKER.length + INDEX_BUILDINGS.length + INDEX_ARISTOCRATS.length + INDEX_EXCHANGE.length)
+export const CardType = {
+    Lumberack: 0,
+    Goldminer: 1,
+    Sheperd: 2,
+    FurTrapper: 3,
+    ShipBuilder: 4,
+    CzarAndCarpenter: 5,
+
+    Market: 6,
+    CustomsHouse: 7,
+    Firehouse: 8,
+    Hospital: 9,
+    Library: 10,
+    Theater: 11,
+    Academy: 12,
+    PotemkinViallage: 13,
+    Pub: 14,
+    WareHouse: 15,
+    Observatory: 16,
+
+    Author: 17,
+    Administrator: 18,
+    WarehouseManager: 19,
+    Secratary: 20,
+    Controller: 21,
+    Judge: 22,
+    MistressOfCeremonies: 23,
+
+    CarpenterWorkshop: 24,
+    GoldSmelter: 25,
+    WeavingMill: 26,
+    FurShop: 27,
+    Wharf: 28,
+    Bank: 29,
+    Peterhof: 30,
+    StIsaacsCathedral: 31,
+    MarinksyTheater: 32,
+    ChurchOfTheResurrection: 33,
+    Harbor: 34,
+    CathedralOfTheGreatPalace: 35,
+    SmolnyCathedral: 36,
+    Hermitage: 37,
+    WinterPalace: 38,
+    Abbot: 39,
+    WeaponMaster: 40,
+    ChamberMaid: 41,
+    Builder: 42,
+    Senator: 43,
+    Patriarch: 44,
+    Taxman: 45,
+    Admiral: 46,
+    MinisterOfForeignAffairs: 47,
+    Czarin: 48,
+}
+
 export const INDEX_WORKER = [
     CardType.Lumberack,
     CardType.Lumberack,
@@ -134,3 +182,10 @@ export const INDEX_EXCHANGE = [
     CardType.MinisterOfForeignAffairs,
     CardType.Czarin,
 ]
+
+// cardId: CardType
+export const CARDS = INDEX_WORKER.concat(INDEX_BUILDINGS).concat(INDEX_ARISTOCRATS).concat(INDEX_EXCHANGE);
+export const INITIAL_WORKER = Array.from(CARDS.keys()).slice(0,INDEX_WORKER.length)
+export const INITIAL_BUILDINGS = Array.from(CARDS.keys()).slice(INDEX_WORKER.length, INDEX_WORKER.length + INDEX_BUILDINGS.length)
+export const INITIAL_ARISTOCRATS = Array.from(CARDS.keys()).slice(INDEX_WORKER.length + INDEX_BUILDINGS.length, INDEX_WORKER.length + INDEX_BUILDINGS.length + INDEX_ARISTOCRATS.length)
+export const INITIAL_EXCHANGE = Array.from(CARDS.keys()).slice(INDEX_WORKER.length + INDEX_BUILDINGS.length + INDEX_ARISTOCRATS.length, INDEX_WORKER.length + INDEX_BUILDINGS.length + INDEX_ARISTOCRATS.length + INDEX_EXCHANGE.length)
