@@ -1,18 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>St. Petersburg</title>
-  </head>
-  <body>
-    <script src="main.js"></script>
-    <!-- <h1>LastMessage</h1>
-    <p id="messageContainer">
-        noLastMessage
-    </p>
-    <Button id="messageSend">Send: Hallo!</Button>
-    <Button id="passTurnButton">Pass Turn</Button>
-    <div id='eventList'></div> -->
-    <div id="root"></div>
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <title>St. Petersburg</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+  <script src="main.js"></script>
+  <div id="root">
+    <div id="welcomeBox">
+      <h2>Welcome to the St. Petersburg Widget</h2><br>
+      You need to be authenticated to play<br>
+      It is super simple though, the authentication works by just joining this room:
+      <p id="roomLinkP" style="text-align: center;"></p>
+      The Widget will check if you have joined this room and you can play. This serves two purposes:
+      <ul>
+        <li>First I can estimate how many
+          people play this widget. If this exceeds the realm of a tech demo and is a competitor to official platforms
+          I can inform the publisher and a solution can be found.</li>
+        <li>The second advantage is, that the authentication-room can also be used
+          to quickly ask for help or serach for ppl to play with!</li>
+      </ul>
+      <div style="display: flex;justify-content: center;margin: 0 20%;">
+        <button style="flex-grow: 1;" id="tryAuthenticationButton">I joined the room, try again!</button>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>

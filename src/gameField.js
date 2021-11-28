@@ -50,7 +50,7 @@ function CardFieldRow(props) {
     let onCardActivate = props.onCardActivate;
     let cardSelector = props.cardSelector;
 
-    return <div className={"CardFieldRow"}>
+    return <div className={"CardFieldRow" + " " + (props.className || "")}>
         {cardIds.map(
             (cardId, index) => {
                 return <Card
@@ -83,7 +83,7 @@ function StartPhaseIndicator(props) {
         [CardCategory.Worker]: "green",
         [CardCategory.Aristocrat]: "red",
         [CardCategory.Building]: "blue",
-        [CardCategory.Exchange]: "white",
+        [CardCategory.Exchange]: "#ccc",
     }
     let style = {
         backgroundColor: colors[props.phase]
@@ -96,21 +96,44 @@ function PlayerBox(props) {
     let curP = props.currentPlayer;
     let gs = props.gs;
     let isCurrent = curP.matrixId == p.matrixId;
-    let idLabel = p.matrixId;
     let cardSelector = props.cardSelector;
-    if (p.matrixId == props.thisPlayerMatrixId) {
+    let expanded = props.expanded;
+
+    let handCards = createCardIdArray(p.handCards, p.handSize, false);
+    let yourPlayer = p.matrixId == props.thisPlayerMatrixId;
+    let idLabel = p.matrixId;
+    if (yourPlayer) {
+        expanded = true;
         idLabel = <>You: <b>{idLabel}</b></>;
     }
-    let handCards = createCardIdArray(p.handCards, p.handSize, false);
-    return <div style={{ position: "relative" }} className={isCurrent ? "current" : ""}>
-        <p>{idLabel}</p>
-        <p>Money: <b>{p.money}</b> </p>
-        <p>Points: <b>{p.points}</b></p>
-        <div className={"StartPhaseIndicatorContainer"}>
-            {p.startPhases.map(phase => <StartPhaseIndicator phase={phase} key={phase} />)}
+    let playerInfo = <div>
+        <div className={"playerInfo"}>
+            <div style={{ flexGrow: 1 }}>
+                <p>Money: <b>{p.money}</b> </p>
+                <p>Points: <b>{p.points}</b></p>
+            </div>
+            <div className={"StartPhaseIndicatorContainer"}>
+                {p.startPhases.map(phase => <StartPhaseIndicator phase={phase} key={phase} />)}
+            </div>
         </div>
-        <CardFieldRow currentPlayer={curP} gs={gs} cardIds={handCards} onCardBuy={props.onCardBuy} cardSelector={cardSelector} />
-        <CardFieldRow currentPlayer={curP} gs={gs} cardIds={p.field} onCardActivate={props.onCardActivate} cardSelector={cardSelector} />
+    </div >
+    let playerField = <CardFieldRow
+        className={"playerField"}
+        currentPlayer={curP}
+        gs={gs}
+        cardIds={p.field}
+        onCardActivate={props.onCardActivate}
+        cardSelector={cardSelector}
+    />
+    return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")}>
+        <p>{idLabel}</p>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+            {playerInfo}
+
+            <CardFieldRow className={"hand"} currentPlayer={curP} gs={gs} cardIds={handCards} onCardBuy={props.onCardBuy} cardSelector={cardSelector} />
+            {!expanded && playerField}
+        </div>
+        {expanded && playerField}
     </div>
 }
 class GameField extends Component {
@@ -126,6 +149,7 @@ class GameField extends Component {
         let topCards = createCardIdArray(gs.fieldTop, 8, false);//gs.fieldTop.concat(Array.apply(null, { length: 8 - gs.fieldTop.length }).map(_ => -1));
         let botCards = createCardIdArray(gs.fieldBottom, 8, true);//Array.apply(null, { length: 8 - gs.fieldBottom.length }).map(_ => -1).concat(gs.fieldBottom);
         let cardSelector = this.props.cardSelector;
+        let yourTurn = curP.matrixId == this.props.userId
         console.log("top: ", topCards, "bottom: ", botCards);
         let onCardBuy = (cardId) => {
             let card = Cards.byId(cardId);
@@ -138,17 +162,17 @@ class GameField extends Component {
                 type: TurnType.BuyCard,
                 cardId: cardId
             }
-            if(card.category == CardCategory.Exchange){
-                if(!curP){console.log("EEEEEEEE curP is undefined")}
+            if (card.category == CardCategory.Exchange) {
+                if (!curP) { console.log("EEEEEEEE curP is undefined") }
                 let possibleUpgrades = curP.getPossibleUpgradesForCard(cardId);
-                let possiblePayableUpgrades = possibleUpgrades.filter((c)=> curP.canBuyCard(cardId, gs, c));
+                let possiblePayableUpgrades = possibleUpgrades.filter((c) => curP.canBuyCard(cardId, gs, c));
                 window.Actions.selectCard(possiblePayableUpgrades).then(
-                ((selectedCard)=>{
-                    turn["exchangeCardId"] = selectedCard;
-                    this.props.onTurn(turn);   
-                })
-                    );
-            }else{
+                    ((selectedCard) => {
+                        turn["exchangeCardId"] = selectedCard;
+                        this.props.onTurn(turn);
+                    })
+                );
+            } else {
                 this.props.onTurn(turn);
             }
         }
@@ -166,7 +190,7 @@ class GameField extends Component {
             }
             this.props.onTurn(turn);
         }
-        if (curP.matrixId != this.props.userId || cardSelector !== undefined) {
+        if (!yourTurn || cardSelector !== undefined) {
             onCardTake = null;
             onCardBuy = null;
             onCardActivate = null;
@@ -189,7 +213,7 @@ class GameField extends Component {
                     }
                     )}
                 </div>
-                <div className={'field'} >
+                <div className={'field' + (yourTurn ? ' yourTurn' : '')} >
                     <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
                     <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
                 </div>

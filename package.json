@@ -26,6 +26,8 @@
   },
   "dependencies": {
     "@babel/preset-react": "^7.16.0",
-    "matrix-widget-api": "^0.1.0-beta.17"
+    "matrix-widget-api": "^0.1.0-beta.17",
+    "seedrandom": "^3.0.5",
+    "string-hash": "^1.1.3"
   }
 }

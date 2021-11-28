@@ -1,6 +1,9 @@
 import { Cards, CardCategory } from "./cards";
 import * as Helper from "./helper"
 import * as CardIndex from "./cardIndex"
+import App from "./App";
+const stringHash = require("string-hash");
+
 export class GameState {
     constructor(playerIds) {
         if (playerIds === undefined) return;
@@ -39,18 +42,19 @@ export class GameState {
     };
     turns = [];
     isFinished = false;
+    sender = "";
+    
     getBeginningPlayerIndexForPhase(phase) {
         return this.players.indexOf(this.players.find(p => (p.startPhases.includes(phase))));
     }
     drawCardsForNewPhase(initial) {
-        // Todo Make random determined by seeds
         // todo add checks for end of game
         if (this.phase == CardCategory.Worker) {
             this.fieldBottom = this.fieldTop;
             this.fieldTop = [];
         }
         let drawAmount = initial ? this.players.length * 2 : 8 - (this.fieldTop.length + this.fieldBottom.length);
-        let [newDeck, drawnCards] = Helper.randomFromArray(this.cards[this.phase], drawAmount);
+        let [newDeck, drawnCards] = Helper.randomFromArray(this.cards[this.phase], drawAmount, this.seed);
         this.cards[this.phase] = newDeck;
 
         this.fieldTop = drawnCards.concat(this.fieldTop);
@@ -164,6 +168,18 @@ export class GameState {
         }
         let phaseIsExchange = this.phase == CardCategory.Exchange;
         return !(isFinished && oneStackEmpty && phaseIsExchange);
+    }
+
+    getSendObj(){
+        let sendObj = App.cloneGameState(this);
+        delete sendObj.seed;
+        delete sendObj.sender;
+        console.log("sendObj: ", sendObj)
+        return sendObj;
+    }
+
+    getHash(){
+        return stringHash(JSON.stringify(this.getSendObj()));
     }
 }
 export const TurnType = {
@@ -280,11 +296,13 @@ export class Player {
         discount += gs.fieldBottom.includes(cardId) ? 1 : 0;
         return discount
     }
+    
     priceForExchangeCard(cardId, gs, exchangeId) {
         let discountTotal = Cards.byId(exchangeId).price + this.discountsForCard(cardId, gs);
         let price = Math.max(Cards.byId(cardId).price - discountTotal, 1)
         return price;
     }
+    
     minPriceForCard(cardId, gs) {
 
         let discount = this.discountsForCard(cardId, gs);
@@ -297,7 +315,7 @@ export class Player {
         let price = Math.max(buyCard.price - discount, 1)
         return price;
     }
-
+    
 }
 
 export function getGameState(turns, initialGameState) {

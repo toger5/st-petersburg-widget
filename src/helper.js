@@ -1,5 +1,6 @@
-export function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
+import {alea} from 'seedrandom'
+export function shuffle(array, seed) {
+    return array.sort(() => (seed ? alea(seed) : Math.random()) - 0.5);
 }
 export function splitIntoChunks(array, chunkSizes) {
     let ret = [];
@@ -10,9 +11,32 @@ export function splitIntoChunks(array, chunkSizes) {
     }
     return ret;
 }
-export function randomFromArray(array, amount){
-    let arrayShuffled = shuffle(array);
+export function randomFromArray(array, amount, seed){
+    let arrayShuffled = shuffle(array, seed);
     let choices = arrayShuffled.slice(0, amount)
     let ret_array = arrayShuffled.slice(amount)
     return [ret_array.sort(), choices]
 }
+
+export function deepEqual(object1, object2) {
+    const keys1 = Object.keys(object1);
+    const keys2 = Object.keys(object2);
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+    for (const key of keys1) {
+      const val1 = object1[key];
+      const val2 = object2[key];
+      const areObjects = isObject(val1) && isObject(val2);
+      if (
+        areObjects && !deepEqual(val1, val2) ||
+        !areObjects && val1 !== val2
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function isObject(object) {
+    return object != null && typeof object === 'object';
+  }
