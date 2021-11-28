@@ -1,6 +1,14 @@
 import {alea} from 'seedrandom'
 export function shuffle(array, seed) {
-    return array.sort(() => (seed ? alea(seed) : Math.random()) - 0.5);
+    let arrayCopy = [...array]
+    let rng = alea(seed);
+    let shuffelArr = []
+    while(arrayCopy.length > 0){
+      let index = Math.floor(rng() * arrayCopy.length)%(arrayCopy.length-1);
+      shuffelArr.push(arrayCopy.splice(index,1)[0]);
+    }
+    return shuffelArr;
+    // return array.sort(() => (seed ? alea(seed) : Math.random()) - 0.5);
 }
 export function splitIntoChunks(array, chunkSizes) {
     let ret = [];
