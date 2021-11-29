@@ -79,16 +79,13 @@ function createCardIdArray(cardIndices, amount, inverse = false) {
 }
 
 function StartPhaseIndicator(props) {
-    let colors = {
-        [CardCategory.Worker]: "green",
-        [CardCategory.Aristocrat]: "red",
-        [CardCategory.Building]: "blue",
-        [CardCategory.Exchange]: "#ccc",
+    let classes = {
+        [CardCategory.Worker]: "Worker",
+        [CardCategory.Aristocrat]: "Aristocrat",
+        [CardCategory.Building]: "Building",
+        [CardCategory.Exchange]: "Exchange",
     }
-    let style = {
-        backgroundColor: colors[props.phase]
-    }
-    return <div style={style}></div>;
+    return <div className={classes[props.phase]}></div>;
 }
 
 function PlayerBox(props) {
