@@ -92,7 +92,7 @@ class App extends Component {
             "msgtype": "m.text",
             "body": "🕍 " + gameState.getCurrentPlayer().matrixId + " It's your turn!\n_Automatically created by the St. Petersburg Widget_",
             "format": "org.matrix.custom.html",
-            "formatted_body": "🕍 "+ gameState.getCurrentPlayer().matrixId +" It's your turn!<br><em>Automatically created by the St. Petersburg Widget</em>"
+            "formatted_body": "🕍 <a href=\"https://matrix.to/#/"+gameState.getCurrentPlayer().matrixId+"\">"+gameState.getCurrentPlayer().matrixId+"</a> It's your turn!<br><em>Automatically created by the St. Petersburg Widget</em>"
         }
         // might need to change event key to: "" -> widgetsId
         this.widgetApi.sendStateEvent(ST_PETERSBURG_EVENT_NAME, this.props.widgetId, content);
