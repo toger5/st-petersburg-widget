@@ -206,6 +206,14 @@ export class Player {
     field = [];
     startPhases = [];
     disabledCards = []
+    getSortedField(){
+        return [...this.field].sort((cIdA, cIdB) => {
+            const [cA, cB] = [Cards.byId(cIdA), Cards.byId(cIdB)]
+            const categoryA = cA.category == CardCategory.Exchange ? cA.upgradeCategory :cA.category;
+            const categoryB = cB.category == CardCategory.Exchange ? cB.upgradeCategory :cB.category;
+            return ((categoryA * 1000) + cIdA) - ((categoryB * 1000) + cIdB)
+        });
+    }
     phaseEvalutation(gameState) {
         if(gameState.phase == CardCategory.Exchange) return;
         let cardsToEvaluate = this.field

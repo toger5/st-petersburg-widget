@@ -118,7 +118,7 @@ function PlayerBox(props) {
         className={"playerField"}
         currentPlayer={curP}
         gs={gs}
-        cardIds={p.field}
+        cardIds={p.getSortedField()}
         onCardActivate={props.onCardActivate}
         cardSelector={cardSelector}
     />
