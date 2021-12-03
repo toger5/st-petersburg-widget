@@ -526,7 +526,7 @@ cardsByType.set(CardType.Taxman, {
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_tax_man_EN.jpg",
     price:17,
     points:0,
-    money: (player, _gameState) => {
+    money: (player) => {
         let greenCards = player.field.filter( c => {
             let card = Cards.byId(c);
             return card.category == CardCategory.Worker ||
