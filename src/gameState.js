@@ -127,14 +127,6 @@ export class GameState {
                 break;
             }
             case TurnType.BuyCard: {
-                // let playerCards = this.getCurrentPlayer().field;
-                // // discount from dublicate cards
-                // let discount = playerCards.filter(c => Cards.byId(c).type == Cards.byId(turn.cardId).type).length;
-                // // discount from other cards
-                // let buyCard = Cards.byId(turn.cardId);
-                // discount += playerCards.filter(c => Cards.byId(c).discountCategory == buyCard.category).length;
-                // let price = Math.max(buyCard.price - discount, 1)
-                // console.log("Buying card, cost:", buyCard.price, " for:", price, " with discount:", discount)
                 const curP = this.getCurrentPlayer();
                 let price = curP.minPriceForCard(turn.cardId, this);
                 this.removeCardFromGame(turn.cardId);
