@@ -6,7 +6,7 @@ const stringHash = require("string-hash");
 
 export class GameState {
     constructor(playerIds) {
-        if (playerIds === undefined || playerIds === []) return;
+        if (!playerIds || playerIds === []) return;
         // Init Players
         let playerCount = playerIds.length;
         if (playerCount < 2) { console.error("too little players"); }
@@ -88,7 +88,6 @@ export class GameState {
         if (this.phase == CardCategory.Worker) {
             let prevStartPhases = this.players.map(p => Array.from(p.startPhases))
             for (const [i, p] of this.players.entries()) {
-                p.disabledCards = [];
                 p.startPhases = prevStartPhases[(i + 1) % this.players.length]
             }
         }
@@ -130,7 +129,7 @@ export class GameState {
                 const curP = this.getCurrentPlayer();
                 let price = curP.minPriceForCard(turn.cardId, this);
                 this.removeCardFromGame(turn.cardId);
-                if (turn.exchangeCardId !== undefined) {
+                if (turn.exchangeCardId != null) {
                     // window.app
                     price = curP.priceForExchangeCard(turn.cardId, this, turn.exchangeCardId);
                     this.removeCardFromGame(turn.exchangeCardId);
@@ -240,9 +239,10 @@ export class Player {
         }
         this.money += m;
         this.points += p;
+        this.disabledCards = [];
     }
     canTakeCard(cardId, gs, skipFieldCheck) {
-        if (Cards.byId(cardId) == undefined) return false;
+        if (!Cards.byId(cardId)) return false;
         // check if card  if on one of the field
         let cardsPossibleToTake = gs.fieldBottom.concat(gs.fieldTop);
         let cardIsOnAccessibleField = cardsPossibleToTake.includes(cardId);
@@ -254,7 +254,7 @@ export class Player {
     }
 
     canBuyCard(cardId, gs, exchangeId, skipFieldCheck) {
-        if (Cards.byId(cardId) == undefined) return false;
+        if (!Cards.byId(cardId)) return false;
         // check if card  if on one of the field
         let cardsPossibleToBuy = gs.fieldBottom.concat(gs.fieldTop).concat(this.handCards);
         let cardIsOnAccessibleField = cardsPossibleToBuy.includes(cardId);
@@ -268,11 +268,11 @@ export class Player {
             let posExchanges = this.getPossibleUpgradesForCard(cardId);
 
             // is exchange card valid
-            canBeExchanged = (exchangeId === undefined)
+            canBeExchanged = (exchangeId == null)
                 ? posExchanges.length > 0
                 : posExchanges.includes(exchangeId)
             // check if card can be afforded with the specific exchange card
-            enoughMoney = (exchangeId === undefined)
+            enoughMoney = (exchangeId == null)
                 ? enoughMoney
                 : this.money >= this.priceForExchangeCard(cardId, gs, exchangeId)
         }
@@ -280,7 +280,7 @@ export class Player {
 
     }
     canActivateCard(cardId, gs) {
-        if (Cards.byId(cardId) == undefined) return false;
+        if (!Cards.byId(cardId)) return false;
         // check if card  if on one of the field
         let cardIsOnAccessibleField = this.field.includes(cardId);
 

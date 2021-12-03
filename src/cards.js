@@ -200,7 +200,7 @@ cardsByType.set(CardType.Observatory, {
         switch(actionType){
             case ActionType.Buy:
                 let price = curP.minPriceForCard(cardId, gs);
-                if (turn.payload.exchangeCardId !== undefined) {
+                if (turn.payload.exchangeCardId != null) {
                     // window.app
                     price = curP.priceForExchangeCard(cardId, gs, turn.payload.exchangeCardId);
                 }

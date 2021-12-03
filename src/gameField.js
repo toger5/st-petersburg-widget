@@ -213,7 +213,7 @@ class GameField extends Component {
                 this.props.onTurn(turn);
             })
         }
-        if (!yourTurn || cardSelector !== undefined) {
+        if (!yourTurn || cardSelector != null) {
             onCardTake = null;
             onCardBuy = null;
             onCardActivate = null;

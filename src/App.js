@@ -351,7 +351,7 @@ class App extends Component {
             onPlayerChanged={this.playerChanged.bind(this)}
             roomMembers={this.state.roomMembers}
         />
-        const isInHistoryView = this.state.gameStateHistory !== undefined
+        const isInHistoryView = !!this.state.gameStateHistory
         let game;
         if (this.gameRunning()) {
             game =
@@ -382,7 +382,7 @@ class App extends Component {
                     </>
                     }
                     <ControlElement
-                        disabled={!this.state.yourTurn || !(this.state.cardSelector == undefined)}
+                        disabled={!this.state.yourTurn || !!this.state.cardSelector}
                         onPassClick={this.makeTurn.bind(this, { type: TurnType.Pass })}
                         onEndClicked={this.endGame.bind(this)}
                         gameStateHistory={this.state.gameStateHistory}
@@ -391,9 +391,15 @@ class App extends Component {
 
                     {/* Selectors */}
                     {this.state.pubSelector && <PubActivationSelector pubSelector={this.state.pubSelector}/>}
-                    {this.state.deckSelector && <DeckSelector deckSelector={this.state.deckSelector}/>}
+                    {this.state.deckSelector && <DeckSelector deckSelector={this.state.deckSelector} cards={this.state.gameState.cards}/>}
                     {this.state.actionTypeSelector && <ActionTypeSelector actionTypeSelector={this.state.actionTypeSelector} gameState={this.state.gameState}/>}
                     
+                    {(/*you can not cancel actionTypeSelector*/this.state.pubSelector || this.state.deckSelector || this.state.cardSelector) &&
+                        <button class="CancelButton" onClick={()=>{this.setState({cardSelector:null, pubSelector:null,deckSelector:null, actionTypeSelector:null})}}>
+                            Cancel
+                        </button>
+                    }
+
                     {this.state.gameState.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
                 </div>
         }
@@ -408,8 +414,8 @@ class App extends Component {
 function ControlElement(props) {
     return <div style={{ display: "flex", flexDirection: "row" }}>
         <button disabled={props.disabled} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
-        {props.gameStateHistory === undefined && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
-        {props.gameStateHistory !== undefined && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
+        {!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
+        {!!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
         <button style={{ flexGrow: 1 }} onClick={props.onEndClicked}>End Game</button>
     </div>;
 }
@@ -445,7 +451,9 @@ function DeckSelector(props){
         {label: "Exchange", category: CardCategory.Exchange}];
     return <div className={"DeckSelector"}>
         {options.map(op => {
-            return <button onClick={selector.onSelect.bind(null, op.category)} className={op.label+" DeckCategoryButton"}>{op.label}</button>
+            return <button disabled={props.cards[op.category].length <= 0} onClick={selector.onSelect.bind(null, op.category)} className={op.label+" DeckCategoryButton"}>
+                {op.label}<span>({props.cards[op.category].length})</span>
+                </button>
         })}
         </div>
 }

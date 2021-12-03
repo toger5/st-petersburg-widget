@@ -1,12 +1,12 @@
-.App{
+.App {
     display: flex;
     flex-direction: column;
 }
-.GameHeader{
+.GameHeader {
     /* background-color: blue; */
     display: flex;
 }
-.GameHeader div{
+.GameHeader div {
     display: flex;
     justify-content: end;
     flex-direction: column;
@@ -26,20 +26,20 @@
     border-color: #e4b835;
     opacity: 0.5;
 }
-.GameHeader div p{
+.GameHeader div p {
     margin: 0;
     text-align: right;
     font-size: x-small;
     color: white;
     right: 0;
 }
-.GameHeader .current{
+.GameHeader .current {
     opacity: 1;
     box-shadow: 0 0 8px grey;
     /* border-color: #000000; */
 }
 
-.GameHeader .Worker{
+.GameHeader .Worker {
     background-color: #479048;
     background-image: url(/res/worker.png);
 }
@@ -47,11 +47,17 @@
     background-color: #3991d0;
     background-image: url(/res/building.png);
 }
-.GameHeader .Aristocrat{
+.GameHeader .Aristocrat {
     background-color: #991e22;
     background-image: url(/res/aristocrat.png);
 }
-.GameHeader .Exchange{
+.GameHeader .Exchange {
     background-color: rgb(187, 187, 187);
     background-image: url(/res/exchange.png);
+}
+
+.CancelButton {
+    position: fixed;
+    top: 10px;
+    right: 10px;
 }
