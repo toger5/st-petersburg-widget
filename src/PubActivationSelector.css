@@ -1,0 +1,12 @@
+.PubActivationSelector {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    left: 40px;
+    top: 40px;
+    padding: 30px;
+    right: 40px;
+    background-color: white;
+    border-radius: 5px;
+    border: solid black 1px;
+}

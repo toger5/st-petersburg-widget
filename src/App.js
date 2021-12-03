@@ -7,6 +7,7 @@ import { GameState, Player, getGameState, TurnType } from './gameState'
 import GameField from './gameField'
 import { StartGamePage } from "./StartGamePage"
 import "./App.css"
+import "./PubActivationSelector.css"
 import { deepEqual } from './helper'
 import { CardCategory } from "./cards";
 const stringHash = require("string-hash");
@@ -22,6 +23,10 @@ class App extends Component {
         this.startState = null;
         window.Actions = {
             selectCard: this.selectCard.bind(this),
+            selectDeck: this.selectDeck.bind(this),
+            selectCardFromDeck: this.selectCardFromDeck.bind(this),
+            selectCard: this.selectCard.bind(this),
+            selectPubActivationCount: this.selectPubActivationCount.bind(this),
         }
         this.state = {
             roomMembers: [],
@@ -30,12 +35,13 @@ class App extends Component {
             gameState: new GameState(),
             yourTurn: false,
             lockUI: false,
-            cardSelector: undefined,
             gameStateHistory: undefined,
             gameStateHistoryIndex: 0,
-            // deckSelector: undefined,
+            cardSelector: undefined,
+            deckSelector: undefined,
+            cardFromDeckSelector: undefined,
             // trashSelector: undefied,
-            // pubSelector: undefined
+            pubSelector: undefined
         };
     }
     test = 10;
@@ -147,13 +153,65 @@ class App extends Component {
         });
         return promise;
     }
+    selectDeck(){
+        let promise = new Promise((deckSelected) => {
+            let deckSelector = {
+                onSelect: (deckCategory) => {
+                    deckSelected(deckCategory)
+                    this.setState({
+                        deckSelector: null,
+                    })
+                }
+            }
+            this.setState({
+                deckSelector: deckSelector,
+            })
+        });
+        return promise;
+    }
+    selectCardFromDeck(deckCategory) {
+        let promise = new Promise((cardSelected) => {
+            let cardFromDeckSelector = {
+                deckCategory: deckCategory,
+                onSelect: (cardId) => {
+                    cardSelected(cardId)
+                    this.setState({
+                        cardFromDeckSelector: null,
+                    })
+                }
+            }
+            this.setState({
+                cardFromDeckSelector: cardFromDeckSelector,
+            })
+        });
+        return promise;
+    }
+    selectPubActivationCount(possibleActivations) {
+        let promise = new Promise((pubSelected) => {
+            let pubSelector = {
+                possibleActivations: possibleActivations,
+                onSelect: (activationCount) => {
+                    pubSelected(activationCount)
+                    this.setState({
+                        pubSelector: null,
+                    })
+                }
+            }
+            this.setState({
+                pubSelector: pubSelector,
+            })
+        });
+        return promise;
+    }
+
     static cloneGameState(gameStateA) {
-        let gameStateB = new GameState(gameStateA.players.map(p => p.matrixId));
-        Object.assign(gameStateB, gameStateA)
-        gameStateB.players = gameStateA.players.map((p) => {
+        const copiedA = JSON.parse(JSON.stringify(gameStateA));
+        let gameStateB = new GameState();
+        Object.assign(gameStateB, copiedA);
+        gameStateB.players = gameStateB.players.map((p) => {
             let pl = new Player();
             return Object.assign(pl, p);
-        })
+        }) 
         return gameStateB;
     }
     handleStPetersburgEvent(evData) {
@@ -330,6 +388,7 @@ class App extends Component {
                         gameStateHistory={this.state.gameStateHistory}
                         onActivateHistoryView={this.toggleHistoryView.bind(this, isInHistoryView)}
                     />
+                    {this.state.pubSelector && <PubActivationSelector pubSelector={this.state.pubSelector}/>}
                     {this.state.gameState.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
                 </div>
         }
@@ -357,5 +416,17 @@ function GameHeader(props) {
         <div className={"Aristocrat "+(props.phase == CardCategory.Aristocrat ? "current":"")}></div>
         <div className={"Exchange "+(props.phase == CardCategory.Exchange ? "current":"")}></div>
         </div>
+}
+
+
+function PubActivationSelector(props){
+    let pSelector = props.pubSelector;
+    return <div className={"PubActivationSelector"}>
+        <p>Select how often to use your pub:</p>
+    {Array.from(Array(pSelector.possibleActivations-1).keys()).map(i=>{
+        let count = i+1;
+        return <button key={i} onClick={pSelector.onSelect.bind(null, count)}>{count*2+" Rubel -> "+count+" Points"}</button>
+    })}
+    </div>
 }
 export default App;

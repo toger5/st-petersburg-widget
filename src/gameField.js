@@ -12,12 +12,11 @@ function Card(props) {
     let onCardTake = curP?.canTakeCard(cardId, gs)
         ? props.onCardTake?.bind(null, cardId) : null;
 
-    let functionOnBuy = props.onCardBuy?.bind(null, cardId);
-    let boolCanBuy = curP?.canBuyCard(cardId, gs);
-    let onCardBuy = boolCanBuy ? functionOnBuy : null;
+    let onCardBuy = curP?.canBuyCard(cardId, gs) 
+        ? props.onCardBuy?.bind(null, cardId) : null;
 
     let onCardActivate = curP?.canActivateCard(cardId, gs)
-        ? props.canActivateCard?.bind(null, cardId) : null;
+        ? props.onCardActivate?.bind(null, cardId) : null;
 
     let style = {};
     if (cardObj) {
@@ -164,10 +163,10 @@ class GameField extends Component {
                 let possibleUpgrades = curP.getPossibleUpgradesForCard(cardId);
                 let possiblePayableUpgrades = possibleUpgrades.filter((c) => curP.canBuyCard(cardId, gs, c));
                 window.Actions.selectCard(possiblePayableUpgrades).then(
-                    ((selectedCard) => {
+                    (selectedCard) => {
                         turn["exchangeCardId"] = selectedCard;
                         this.props.onTurn(turn);
-                    })
+                    }
                 );
             } else {
                 this.props.onTurn(turn);
@@ -181,11 +180,14 @@ class GameField extends Component {
             this.props.onTurn(turn);
         }
         let onCardActivate = (cardId) => {
-            let turn = {
-                type: TurnType.ActivateCard,
-                cardId: cardId
-            }
-            this.props.onTurn(turn);
+            Cards.byId(cardId).getActionPayload(gs).then((payload)=>{
+                let turn = {
+                    type: TurnType.ActivateCard,
+                    cardId: cardId,
+                    payload: payload,
+                }
+                this.props.onTurn(turn);
+            })
         }
         if (!yourTurn || cardSelector !== undefined) {
             onCardTake = null;

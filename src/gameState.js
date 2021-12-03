@@ -142,9 +142,8 @@ export class GameState {
             }
             case TurnType.ActivateCard: {
                 let card = Cards.byId(turn.cardId);
-                if (!card.activate) { console.log("could not activate card: ", card); return; }
-
-                card.activate();
+                if (!card.action) { console.log("could not activate card: ", card); return; }
+                card.action(this, turn);
                 this.getCurrentPlayer().disabledCards.push(turn.cardId);
                 this.nextPlayer();
                 break;

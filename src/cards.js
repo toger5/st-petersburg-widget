@@ -149,7 +149,23 @@ cardsByType.set(CardType.Pub, {
     points:0,
     money:0,
     category:CardCategory.Building,
-    action: ()=>{console.log("Pub activated")}
+    action: (gs, turn)=>{
+        let factor = turn.payload.activationCount;
+        let curP = gs.getCurrentPlayer();
+        curP.money -= factor * 2
+        curP.points += factor
+        console.log("Pub activated")
+    },
+    getActionPayload: (gs) => {
+        const p = new Promise((resolve) => {
+            window.Actions.selectPubActivationCount(Math.min(5,Math.floor(gs.getCurrentPlayer().money/2))).then(
+                (activationCount)=>{
+                    resolve({activationCount:activationCount});
+                }
+            )
+        });
+        return p;
+    }
 });
 
 cardsByType.set(CardType.WareHouse, {
