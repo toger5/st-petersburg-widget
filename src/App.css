@@ -62,6 +62,7 @@
     right: 10px;
 }
 .LoadingIndicator {
+    z-index: 1;
     position: fixed;
     display: flex;
     align-items: center;
