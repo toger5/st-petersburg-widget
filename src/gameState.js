@@ -234,8 +234,8 @@ export class Player {
         let m = 0;
         let p = 0;
         for (let c of cardsToEvaluate) {
-            m += typeof c === 'function' ? c.money() : c.money;
-            p += typeof p === 'function' ? p.point() : c.points;
+            m += typeof c === 'function' ? c.money(this) : c.money;
+            p += typeof p === 'function' ? p.points(this) : c.points;
         }
         this.money += m;
         this.points += p;

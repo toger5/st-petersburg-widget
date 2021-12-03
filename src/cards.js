@@ -1,6 +1,7 @@
 import { CARDS, CardType } from "./cardIndex";
 import { ActionType } from "./App";
 import * as helper from './helper';
+import { Card } from "./gameField";
 
 export const CardCategory = {
     Worker:0,
@@ -391,7 +392,10 @@ cardsByType.set(CardType.MarinksyTheater, {
 	type: CardType.MarinksyTheater,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_marinsky_EN.jpg",
     price:15,
-    points:(gameState)=>{return 5},
+    points: (player) => {
+        let redCards = player.field.filter( c => Cards.byId(c).category == CardCategory.Aristocrat);
+        return redCards.length;
+    },
     money:0,
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Building,
@@ -522,7 +526,14 @@ cardsByType.set(CardType.Taxman, {
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_tax_man_EN.jpg",
     price:17,
     points:0,
-    money:(gameState)=>{return 10;},
+    money: (player, _gameState) => {
+        let greenCards = player.field.filter( c => {
+            let card = Cards.byId(c);
+            return card.category == CardCategory.Worker ||
+            (card.category == CardCategory.Exchange && card.upgradeCategory == CardCategory.Worker);
+        })
+        return greenCards.length;
+    },
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Aristocrat,
 });
