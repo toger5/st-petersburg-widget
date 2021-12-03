@@ -7,16 +7,17 @@ export function StartGamePage(props) {
     let onChange = props.onPlayerChanged;
     let roomMembers = props.roomMembers;
     return <div style={{ padding: "10px" }}>
-        {(gameState.isFinished) &&
+        {(gameState.isGameOver) &&
             <div>
                 {gameState.isCancelled() && <>The game got cancelld. Start a new one!</>}
-                {!gameState.isCancelled() &&
+                {(gameState.isPlayedToEnd() && gameState.isGameOver) &&
                     <> The game is over, the winner is: <br />
                         {gameState?.players?.sort((a, b) => a.points - b.points).length > 0
                             ? gameState?.players?.sort((a, b) => a.points - b.points)[0].userId
                             : null
                         }
-                    </>}
+                    </>
+                }
             </div>
         }
         <div><button onClick={initializeGame}>Start Game</button></div>

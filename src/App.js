@@ -19,6 +19,7 @@ class App extends Component {
         this.widgetApi = props.widgetApi;
         this.userId = props.userId;
         this.prev_gameState = null;
+        this.startState = null;
         window.Actions = {
             selectCard: this.selectCard.bind(this),
         }
@@ -30,6 +31,8 @@ class App extends Component {
             yourTurn: false,
             lockUI: false,
             cardSelector: undefined,
+            gameStateHistory: undefined,
+            gameStateHistoryIndex: 0,
             // deckSelector: undefined,
             // trashSelector: undefied,
             // pubSelector: undefined
@@ -77,11 +80,11 @@ class App extends Component {
         });
     }
 
-    sendStPetersburgEvent(gameState, hashFromPrevState) {
+    sendStPetersburgEvent(gameState, hashFromPrevState, startState) {
         this.setState({
             lockUI: true,
         })
-        let content = { "gameState": gameState.getSendObj(), "hash": hashFromPrevState }
+        let content = { "gameState": gameState.getSendObj(), "hash": hashFromPrevState, "startState": startState?.getSendObj() }
         let roomMessageContent = {
             "msgtype": "m.text",
             "body": "# hallo\n_test_",
@@ -90,9 +93,9 @@ class App extends Component {
         }
         let roomNotifyContent = {
             "msgtype": "m.text",
-            "body": "🕍 " + gameState.getCurrentPlayer().matrixId + " It's your turn!\n_Automatically created by the St. Petersburg Widget_",
+            "body": "🕍 " + gameState.getCurrentPlayer().matrixId + " It's your turn!\n_Sent from the St. Petersburg Widget_",
             "format": "org.matrix.custom.html",
-            "formatted_body": "🕍 <a href=\"https://matrix.to/#/"+gameState.getCurrentPlayer().matrixId+"\">"+gameState.getCurrentPlayer().matrixId+"</a> It's your turn!<br><em>Automatically created by the St. Petersburg Widget</em>"
+            "formatted_body": "🕍 <a href=\"https://matrix.to/#/"+gameState.getCurrentPlayer().matrixId+"\">"+gameState.getCurrentPlayer().matrixId+"</a> It's your turn!<br><em>Sent from the St. Petersburg Widget</em>"
         }
         // might need to change event key to: "" -> widgetsId
         this.widgetApi.sendStateEvent(ST_PETERSBURG_EVENT_NAME, this.props.widgetId, content);
@@ -104,27 +107,27 @@ class App extends Component {
         let cheatErrorListFormatted = cheatMessages.map(err => "<br><strong>" + err.msg + "</strong><br><em>" + err.details+"</em>")
         let roomCheatAlert = {
             "msgtype": "m.text",
-            "body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>"+cheatErrorList+"\n_Automatically created by the St. Petersburg Widget_",
+            "body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>"+cheatErrorList+"\n_Sent from the St. Petersburg Widget_",
             "format": "org.matrix.custom.html",
-            "formatted_body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>"+cheatErrorListFormatted+"<br><em>Automatically created by the St. Petersburg Widget</em>",
+            "formatted_body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>"+cheatErrorListFormatted+"<br><em>Sent from the St. Petersburg Widget</em>",
         }
         this.widgetApi.sendRoomEvent("m.room.message", roomCheatAlert, "");
     }
     initializeGame() {
         let gameState = new GameState(Array.from(this.state.selectedRoomMember));
-        this.sendStPetersburgEvent(gameState, gameState.getHash());
+        this.sendStPetersburgEvent(gameState, gameState.getHash(), gameState);
     }
 
     endGame() {
-        this.state.gameState.isFinished = true;
-        this.sendStPetersburgEvent(this.state.gameState, null);
+        this.state.gameState.isGameOver = true;
+        this.sendStPetersburgEvent(this.state.gameState, null, this.startState);
     }
 
     makeTurn(turn) {
         // the turn type gets extended with a nextTurn: true field in next state after turn if the next phase is started
         let hash = this.state.gameState.getHash()
         this.state.gameState.nextStateAfterTurn(turn);
-        this.sendStPetersburgEvent(this.state.gameState, hash);
+        this.sendStPetersburgEvent(this.state.gameState, hash, this.startState);
     }
 
     selectCard(optionCardIds) {
@@ -154,19 +157,21 @@ class App extends Component {
         return gameStateB;
     }
     handleStPetersburgEvent(evData) {
-        let newGs = App.cloneGameState(evData.content.gameState)
+        let newGs = App.cloneGameState(evData.content.gameState);
+        const startState = App.cloneGameState(evData.content.startState);
         // newGs.seed = // will be set accodingly depending on newGs.turns.length != 0
         newGs.sender = evData.sender;
 
-        if (newGs.turns.length != 0 && !newGs.isFinished) {
+        if (newGs.turns.length != 0 && !newGs.isGameOver) {
             // Do validation and track previous event
             if (evData.unsigned?.prev_content?.gameState) {
-                // handle from readEvent callback
+                // handle from "readEvent" callback
                 this.prev_gameState = App.cloneGameState(evData.unsigned?.prev_content?.gameState)
+                this.startState = App.cloneGameState(evData.unsigned?.prev_content?.startState);
                 this.prev_gameState.sender = evData.unsigned?.prev_sender;
                 this.prev_gameState.seed = evData.unsigned?.prev_content.hash;
             } else if (this.prev_gameState) {
-                // handle from on callback
+                // handle from "on" callback
                 let seed = this.prev_gameState.getHash();
                 this.prev_gameState = App.cloneGameState(this.state.gameState);
                 this.prev_gameState.sender = this.state.gameState.sender;
@@ -175,24 +180,33 @@ class App extends Component {
                 console.error("somehow there is no prev GameState")
             }
             newGs.seed = this.prev_gameState.getHash();
-            this.validateGameState(newGs, this.prev_gameState)
+            this.validateGameState(newGs, this.prev_gameState, startState, this.startState)
         } else if (newGs.turns.length == 0) {
             console.log("-----GAME-----INITIALIZED-----,\n not validating the state since it seems to be the initial event")
-            newGs.seed = evData.content.hash; // getting the hash from the init event for the net round
-        } else if (newGs.isFinished) {
-            console.log("-----GAME-----ENDED-----,\n not validating the state since it seems to be the initial event")
+            this.startState = startState;
+            newGs.seed = evData.content.hash; // getting the hash from the init event for the next round
+        } else if (newGs.isGameOver) {
+            console.log("-----GAME-----ENDED-----,\n not validating the state since the game is finished")
             // here we dont care about the seed
         }
 
         this.setState({
             lockUI: false,
             gameState: newGs,//Object.assign(oldGs, newGsContent),
+            startState: startState,
             yourTurn: newGs.getCurrentPlayer().matrixId == this.userId
         });
     }
-    validateGameState(gs, prev_gs) {
+    validateGameState(gs, prev_gs, startState, previousStartState) {
         let cheatMessages = [];
 
+        // check that start state was not altered:
+        if(startState.getHash() != previousStartState.getHash()){
+            cheatMessages.push({
+                msg: "A user changed the start state.",
+                details: "Changing the start state of the game messes with the history and makes it hard reconstruct the game."
+            })
+        }
         // check that the correct player sended:
         let expected_sender = prev_gs.players.map(p => p.matrixId)[(prev_gs.currentPlayerIndex) % prev_gs.players.length]
         if (gs.sender != expected_sender) {
@@ -230,7 +244,7 @@ class App extends Component {
     }
 
     gameRunning() {
-        return !this.state.gameState.isFinished && this.state.gameState.players.length > 0;
+        return !this.state.gameState.isGameOver && this.state.gameState.players.length > 0;
     }
 
     playerChanged(member) {
@@ -242,11 +256,36 @@ class App extends Component {
             selectedRoomMember: newSet
         })
     }
-
+    toggleHistoryView(isInHistoryView){
+        if(isInHistoryView){
+            this.setState({
+                gameStateHistory: undefined,
+            })
+        }else{
+            const hist = GameState.createGameStateHistory(this.startState, this.state.gameState.turns);
+            this.setState({
+                gameStateHistoryIndex: Math.max(hist.length - 1, 0),
+                gameStateHistory: hist,
+            })
+        }
+    }
+    nextHistory(){
+        const newIndex = this.state.gameStateHistoryIndex + 1;
+        if(newIndex < this.state.gameStateHistory.length){
+            this.setState({gameStateHistoryIndex: newIndex});
+        }
+    }
+    prevHistory(){
+        const newIndex = this.state.gameStateHistoryIndex - 1;
+        if(newIndex >= 0){
+            this.setState({gameStateHistoryIndex: newIndex});
+        }
+    }
     render() {
-        console.log("current game state: ", this.state.gameState);
+        console.log("current gameState: ", this.state.gameState);
         console.log("current is startGame: ", this.state.gameState == {});
         console.log("current game is cancelled: ", this.state.gameState.isCancelled());
+        console.log("current game is played to the end: ", this.state.gameState.isPlayedToEnd());
         let startGamePage = <StartGamePage
             gameState={this.state.gameState}
             initializeGame={this.initializeGame.bind(this)}
@@ -254,7 +293,7 @@ class App extends Component {
             onPlayerChanged={this.playerChanged.bind(this)}
             roomMembers={this.state.roomMembers}
         />
-
+        const isInHistoryView = this.state.gameStateHistory !== undefined
         let game;
         if (this.gameRunning()) {
             game =
@@ -264,23 +303,38 @@ class App extends Component {
                         {/* <p>{["Worker", "Building", "Aristocrat", "Exchange"][this.state.gameState.phase]}</p> */}
                         <GameHeader phase={this.state.gameState.phase} />
                     </div>
-                    <GameField
-                        gameState={this.state.gameState}
-                        onTurn={this.makeTurn.bind(this)}
-                        userId={this.userId}
-                        cardSelector={this.state.cardSelector}
-                    />
+                    {!isInHistoryView && 
+                        <GameField
+                            gameState={this.state.gameState}
+                            onTurn={this.makeTurn.bind(this)}
+                            userId={this.userId}
+                            cardSelector={this.state.cardSelector}
+                        />
+                    }
+                    {isInHistoryView &&
+                    <>
+                        <div style={{ display: "flex", flexDirection: "row" }}>
+                            <button disabled={this.state.gameStateHistoryIndex <= 0} style={{ flexGrow: 1 }} onClick={this.prevHistory.bind(this)}>{"< Prev"}</button>
+                            <button disabled={this.state.gameStateHistoryIndex >= this.state.gameStateHistory.length - 1} style={{ flexGrow: 1 }} onClick={this.nextHistory.bind(this)}>{"Next >"}</button>
+                        </div>
+                        <GameField
+                            gameState={this.state.gameStateHistory[this.state.gameStateHistoryIndex]}
+                            userId={this.userId}
+                        />
+                    </>
+                    }
                     <ControlElement
                         disabled={!this.state.yourTurn || !(this.state.cardSelector == undefined)}
                         onPassClick={this.makeTurn.bind(this, { type: TurnType.Pass })}
                         onEndClicked={this.endGame.bind(this)}
+                        gameStateHistory={this.state.gameStateHistory}
+                        onActivateHistoryView={this.toggleHistoryView.bind(this, isInHistoryView)}
                     />
                     {this.state.gameState.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
                 </div>
         }
         return (
             <div className={"App"}>
-
                 {!this.state.lockUI && (game || startGamePage)}
                 {this.state.lockUI && <><h1>Loading</h1><p>This is a very unfortuned lock iu implemntation</p></>}
             </div>
@@ -290,6 +344,8 @@ class App extends Component {
 function ControlElement(props) {
     return <div style={{ display: "flex", flexDirection: "row" }}>
         <button disabled={props.disabled} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
+        {props.gameStateHistory === undefined && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
+        {props.gameStateHistory !== undefined && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
         <button style={{ flexGrow: 1 }} onClick={props.onEndClicked}>End Game</button>
     </div>;
 }

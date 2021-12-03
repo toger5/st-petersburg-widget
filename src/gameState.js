@@ -6,7 +6,7 @@ const stringHash = require("string-hash");
 
 export class GameState {
     constructor(playerIds) {
-        if (playerIds === undefined) return;
+        if (playerIds === undefined || playerIds === []) return;
         // Init Players
         let playerCount = playerIds.length;
         if (playerCount < 2) { console.error("too little players"); }
@@ -41,7 +41,7 @@ export class GameState {
         [CardCategory.Exchange]: CardIndex.INITIAL_EXCHANGE,
     };
     turns = [];
-    isFinished = false;
+    isGameOver = false;
     sender = "";
     
     getBeginningPlayerIndexForPhase(phase) {
@@ -158,16 +158,23 @@ export class GameState {
                 break;
             }
         }
+        if(this.isPlayedToEnd()){
+            this.isGameOver = true;
+            // make the final point calculations for aristocrats!
+
+        }
         this.turns.push(turn);
     }
     isCancelled() {
-        let isFinished = this.isFinished
+        return this.isGameOver && !this.isPlayedToEnd();
+    }
+    isPlayedToEnd(){
         let oneStackEmpty = false;
         for (let i = 0; i < 4; i++) {
             oneStackEmpty = this.cards[i].length == 0
         }
         let phaseIsExchange = this.phase == CardCategory.Exchange;
-        return !(isFinished && oneStackEmpty && phaseIsExchange);
+        return oneStackEmpty && phaseIsExchange;
     }
 
     getSendObj(){
@@ -180,6 +187,19 @@ export class GameState {
 
     getHash(){
         return stringHash(JSON.stringify(this.getSendObj()));
+    }
+
+    static createGameStateHistory(startState, turns){
+        let gs = App.cloneGameState(startState);
+        gs.seed = startState.getHash();
+        let states = [App.cloneGameState(gs)]
+        for(let t of turns){
+            let prevStateHash = gs.getHash();
+            gs.nextStateAfterTurn(t);
+            states.push(App.cloneGameState(gs));
+            gs.seed = prevStateHash;
+        }
+        return states;
     }
 }
 export const TurnType = {
