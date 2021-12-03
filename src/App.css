@@ -61,3 +61,12 @@
     top: 10px;
     right: 10px;
 }
+.LoadingIndicator {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    right: 0;
+    top:0;
+    font-size: xx-small;
+    text-align: end;
+}

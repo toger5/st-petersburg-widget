@@ -9,6 +9,7 @@ import { StartGamePage } from "./StartGamePage"
 import "./App.css"
 import "./DeckSelector.css"
 import "./PubActivationSelector.css"
+import "./loader.css"
 import { deepEqual } from './helper'
 import { CardCategory } from "./cards";
 const stringHash = require("string-hash");
@@ -403,10 +404,11 @@ class App extends Component {
                     {this.state.gameState.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
                 </div>
         }
+        let lock = this.state.lockUI;
         return (
-            <div className={"App"}>
-                {!this.state.lockUI && (game || startGamePage)}
-                {this.state.lockUI && <><h1>Loading</h1><p>This is a very unfortuned lock iu implemntation</p></>}
+            <div className={"App"} style={{pointerEvents: lock ? "none": "auto"}}>
+                {lock && <div className={"LoadingIndicator"}><div className={"loader"}></div></div>}
+                {game || startGamePage}
             </div>
         );
     }
