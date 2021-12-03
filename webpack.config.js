@@ -31,6 +31,7 @@ module.exports = {
     mode: 'development',
     devServer: {
         static: './dist',
+        port: 8081,
     },
     devtool: 'eval-source-map',
 };
