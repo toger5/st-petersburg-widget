@@ -355,16 +355,17 @@ class App extends Component {
         const isInHistoryView = !!this.state.gameStateHistory
         let game;
         if (this.gameRunning()) {
+            let gs = isInHistoryView ? this.state.gameStateHistory[this.state.gameStateHistoryIndex] : this.state.gameState
             game =
                 <div>
                     <div>
                         {/* <p> Hello, {this.props.userId}! </p> */}
                         {/* <p>{["Worker", "Building", "Aristocrat", "Exchange"][this.state.gameState.phase]}</p> */}
-                        <GameHeader phase={this.state.gameState.phase} cards={this.state.gameState.cards}/>
+                        <GameHeader phase={gs.phase} cards={gs.cards}/>
                     </div>
                     {!isInHistoryView && 
                         <GameField
-                            gameState={this.state.gameState}
+                            gameState={gs}
                             onTurn={this.makeTurn.bind(this)}
                             userId={this.userId}
                             cardSelector={this.state.cardSelector}
@@ -377,7 +378,7 @@ class App extends Component {
                             <button disabled={this.state.gameStateHistoryIndex >= this.state.gameStateHistory.length - 1} style={{ flexGrow: 1 }} onClick={this.nextHistory.bind(this)}>{"Next >"}</button>
                         </div>
                         <GameField
-                            gameState={this.state.gameStateHistory[this.state.gameStateHistoryIndex]}
+                            gameState={gs}
                             userId={this.userId}
                         />
                     </>
@@ -401,7 +402,7 @@ class App extends Component {
                         </button>
                     }
 
-                    {this.state.gameState.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
+                    {gs.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
                 </div>
         }
         let lock = this.state.lockUI;
