@@ -359,7 +359,7 @@ class App extends Component {
                     <div>
                         {/* <p> Hello, {this.props.userId}! </p> */}
                         {/* <p>{["Worker", "Building", "Aristocrat", "Exchange"][this.state.gameState.phase]}</p> */}
-                        <GameHeader phase={this.state.gameState.phase} />
+                        <GameHeader phase={this.state.gameState.phase} cards={this.state.gameState.cards}/>
                     </div>
                     {!isInHistoryView && 
                         <GameField
@@ -414,13 +414,15 @@ function ControlElement(props) {
     </div>;
 }
 function GameHeader(props) {
-    // let className = ["Worker", "Building", "Aristocrat", "Exchange"];
+    let classNames = ["Worker", "Building", "Aristocrat", "Exchange"];
+    let phases = [CardCategory.Worker, CardCategory.Building, CardCategory.Aristocrat, CardCategory.Exchange]
     return <div className={"GameHeader"}>
-        <div className={"Worker "+(props.phase == CardCategory.Worker ? "current":"")}></div>
-        <div className={"Building "+(props.phase == CardCategory.Building ? "current":"")}></div>
-        <div className={"Aristocrat "+(props.phase == CardCategory.Aristocrat ? "current":"")}></div>
-        <div className={"Exchange "+(props.phase == CardCategory.Exchange ? "current":"")}></div>
-        </div>
+        {phases.map(p =>{
+            return <div className={classNames[p]+" "+(props.phase == p ? "current":"")}>
+                <p>{props.cards[p].length}</p>
+            </div>
+        })}
+    </div>
 }
 
 

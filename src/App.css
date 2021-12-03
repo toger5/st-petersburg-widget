@@ -7,34 +7,51 @@
     display: flex;
 }
 .GameHeader div{
-    /* border: solid 1px orange; */
-    margin: 2px;
+    display: flex;
+    justify-content: end;
+    flex-direction: column;
+    border: solid 1px orange;
+    margin: 4px;
     padding: 5px;
-    width: 35px;
+    width: 63px;
     height: 35px;
     border-radius: 8px;
     border-color: #f2f5f8;
-    border-width: 3px;
+    border-width: 2.5px;
     border-style: solid;
     background-color: #f2f5f8;
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
+    border-color: #e4b835;
+    opacity: 0.5;
+}
+.GameHeader div p{
+    margin: 0;
+    text-align: right;
+    font-size: x-small;
+    color: white;
+    right: 0;
 }
 .GameHeader .current{
-    /* background-color: #0dbd8b; */
-    border-color: #0dbd8b;
+    opacity: 1;
+    box-shadow: 0 0 8px grey;
+    /* border-color: #000000; */
 }
 
 .GameHeader .Worker{
+    background-color: #479048;
     background-image: url(/res/worker.png);
 }
 .GameHeader .Building {
+    background-color: #3991d0;
     background-image: url(/res/building.png);
 }
 .GameHeader .Aristocrat{
+    background-color: #991e22;
     background-image: url(/res/aristocrat.png);
 }
 .GameHeader .Exchange{
+    background-color: rgb(187, 187, 187);
     background-image: url(/res/exchange.png);
 }
