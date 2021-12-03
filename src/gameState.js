@@ -140,8 +140,8 @@ export class GameState {
                 this.removeCardFromGame(turn.cardId);
                 if (turn.exchangeCardId !== undefined) {
                     // window.app
-                    this.removeCardFromGame(turn.exchangeCardId);
                     price = curP.priceForExchangeCard(turn.cardId, this, turn.exchangeCardId);
+                    this.removeCardFromGame(turn.exchangeCardId);
                 }
                 curP.field.push(turn.cardId);
                 curP.money -= price;
@@ -326,7 +326,8 @@ export class Player {
     }
     
     priceForExchangeCard(cardId, gs, exchangeId) {
-        let discountTotal = Cards.byId(exchangeId).price + this.discountsForCard(cardId, gs);
+        const exchangeCardWorth = Cards.byId(exchangeId).exchangePrice ?? Cards.byId(exchangeId).price
+        let discountTotal = exchangeCardWorth + this.discountsForCard(cardId, gs);
         let price = Math.max(Cards.byId(cardId).price - discountTotal, 1)
         return price;
     }
@@ -335,12 +336,16 @@ export class Player {
 
         let discount = this.discountsForCard(cardId, gs);
         let buyCard = Cards.byId(cardId);
+        let price = Math.max(buyCard.price - discount, 1)
         if (buyCard.category == CardCategory.Exchange) {
             let exchangeOptions = this.getPossibleUpgradesForCard(cardId);
-            let cheapestToUpgradeCardId = exchangeOptions.sort((a, b) => Cards.byId(b).price - Cards.byId(a).price)[0]
-            discount += Cards.byId(cheapestToUpgradeCardId)?.price || 0;
+            let cheapestExchangeCardId = exchangeOptions.sort((a, b) =>{
+                this.priceForExchangeCard(cardId,gs,b) - this.priceForExchangeCard(cardId,gs,a)
+            } )[0]
+            if(cheapestExchangeCardId){
+                price = this.priceForExchangeCard(cardId, gs, cheapestExchangeCardId);
+            }
         }
-        let price = Math.max(buyCard.price - discount, 1)
         return price;
     }
     

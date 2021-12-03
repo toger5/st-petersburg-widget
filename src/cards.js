@@ -136,6 +136,7 @@ cardsByType.set(CardType.PotemkinViallage, {
 	type: CardType.PotemkinViallage,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_potemkin_2_6_EN.jpg",
     price:2,
+    exchangePrice: 6,
     points:0,
     money:0,
     category:CardCategory.Building,
@@ -242,7 +243,7 @@ cardsByType.set(CardType.CarpenterWorkshop, {
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Worker,
     upgradeCards: [CardType.Lumberack, CardType.CzarAndCarpenter],
-    discountCategory: [CardType.Building],
+    discountCategory: CardType.Building,
 });
 
 cardsByType.set(CardType.GoldSmelter, {
@@ -254,7 +255,7 @@ cardsByType.set(CardType.GoldSmelter, {
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Worker,
     upgradeCards: [CardType.Goldminer, CardType.CzarAndCarpenter],
-    discountCategory: [CardType.Aristocrat],
+    discountCategory: CardType.Aristocrat,
 });
 
 cardsByType.set(CardType.WeavingMill, {
