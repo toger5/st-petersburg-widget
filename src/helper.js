@@ -1,11 +1,26 @@
 import {alea} from 'seedrandom'
 export function shuffle(array, seed) {
     let arrayCopy = [...array]
-    let rng = alea(seed);
+    let rng = alea(seed ?? Math.random()*10000000);
     let shuffelArr = []
     while(arrayCopy.length > 0){
       let index = Math.floor(rng() * arrayCopy.length)%(arrayCopy.length-1);
       shuffelArr.push(arrayCopy.splice(index,1)[0]);
+    }
+
+    //sort cheat to make observatorium easier to get.
+    if(false){
+      let foundOne = false;
+      for(const obsId of [28+29,28+30]){
+        if(shuffelArr.includes(obsId) && !foundOne){
+          let indexOfObs = shuffelArr.indexOf(obsId);
+          if(indexOfObs != -1){
+            shuffelArr.splice(indexOfObs,1)[0]
+            shuffelArr.unshift(obsId)
+            foundOne = true;
+          }
+        }
+      }
     }
     return shuffelArr;
     // return array.sort(() => (seed ? alea(seed) : Math.random()) - 0.5);

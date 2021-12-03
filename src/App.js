@@ -4,9 +4,10 @@ import {
     ST_PETERSBURG_EVENT_NAME,
 } from './main'
 import { GameState, Player, getGameState, TurnType } from './gameState'
-import GameField from './gameField'
+import GameField, { Card } from './gameField'
 import { StartGamePage } from "./StartGamePage"
 import "./App.css"
+import "./DeckSelector.css"
 import "./PubActivationSelector.css"
 import { deepEqual } from './helper'
 import { CardCategory } from "./cards";
@@ -24,7 +25,7 @@ class App extends Component {
         window.Actions = {
             selectCard: this.selectCard.bind(this),
             selectDeck: this.selectDeck.bind(this),
-            selectCardFromDeck: this.selectCardFromDeck.bind(this),
+            selectActionTypeForCard: this.selectActionTypeForCard.bind(this),
             selectCard: this.selectCard.bind(this),
             selectPubActivationCount: this.selectPubActivationCount.bind(this),
         }
@@ -39,7 +40,7 @@ class App extends Component {
             gameStateHistoryIndex: 0,
             cardSelector: undefined,
             deckSelector: undefined,
-            cardFromDeckSelector: undefined,
+            actionTypeSelector: undefined,
             // trashSelector: undefied,
             pubSelector: undefined
         };
@@ -103,7 +104,6 @@ class App extends Component {
             "format": "org.matrix.custom.html",
             "formatted_body": "🕍 <a href=\"https://matrix.to/#/"+gameState.getCurrentPlayer().matrixId+"\">"+gameState.getCurrentPlayer().matrixId+"</a> It's your turn!<br><em>Sent from the St. Petersburg Widget</em>"
         }
-        // might need to change event key to: "" -> widgetsId
         this.widgetApi.sendStateEvent(ST_PETERSBURG_EVENT_NAME, this.props.widgetId, content);
         if (LOGGING) this.widgetApi.sendRoomEvent("m.room.message", roomMessageContent, "");
         if (NOTIFY) this.widgetApi.sendRoomEvent("m.room.message", roomNotifyContent, "");
@@ -169,19 +169,19 @@ class App extends Component {
         });
         return promise;
     }
-    selectCardFromDeck(deckCategory) {
-        let promise = new Promise((cardSelected) => {
-            let cardFromDeckSelector = {
-                deckCategory: deckCategory,
-                onSelect: (cardId) => {
-                    cardSelected(cardId)
+    selectActionTypeForCard(cardId) {
+        let promise = new Promise((actionTypeSelected) => {
+            let actionTypeSelector = {
+                cardId: cardId,
+                onSelect: (actionType, _cardId) => {
+                    actionTypeSelected(actionType)
                     this.setState({
-                        cardFromDeckSelector: null,
+                        actionTypeSelector: null,
                     })
                 }
             }
             this.setState({
-                cardFromDeckSelector: cardFromDeckSelector,
+                actionTypeSelector: actionTypeSelector,
             })
         });
         return promise;
@@ -388,7 +388,12 @@ class App extends Component {
                         gameStateHistory={this.state.gameStateHistory}
                         onActivateHistoryView={this.toggleHistoryView.bind(this, isInHistoryView)}
                     />
+
+                    {/* Selectors */}
                     {this.state.pubSelector && <PubActivationSelector pubSelector={this.state.pubSelector}/>}
+                    {this.state.deckSelector && <DeckSelector deckSelector={this.state.deckSelector}/>}
+                    {this.state.actionTypeSelector && <ActionTypeSelector actionTypeSelector={this.state.actionTypeSelector} gameState={this.state.gameState}/>}
+                    
                     {this.state.gameState.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
                 </div>
         }
@@ -423,10 +428,49 @@ function PubActivationSelector(props){
     let pSelector = props.pubSelector;
     return <div className={"PubActivationSelector"}>
         <p>Select how often to use your pub:</p>
-    {Array.from(Array(pSelector.possibleActivations-1).keys()).map(i=>{
+    {Array.from(Array(pSelector.possibleActivations - 1).keys()).map(i => {
         let count = i+1;
         return <button key={i} onClick={pSelector.onSelect.bind(null, count)}>{count*2+" Rubel -> "+count+" Points"}</button>
     })}
     </div>
 }
+
+function DeckSelector(props){
+    let selector = props.deckSelector;
+    const options = [{label: "Worker", category: CardCategory.Worker},
+        {label: "Building", category: CardCategory.Building},
+        {label: "Aristocrat", category: CardCategory.Aristocrat},
+        {label: "Exchange", category: CardCategory.Exchange}];
+    return <div className={"DeckSelector"}>
+        {options.map(op => {
+            return <button onClick={selector.onSelect.bind(null, op.category)} className={op.label+" DeckCategoryButton"}>{op.label}</button>
+        })}
+        </div>
+}
+export const ActionType = {
+    Buy: "buy",
+    Take: "take",
+    Discard: "discard",
+}
+function ActionTypeSelector(props){
+    const selector = props.actionTypeSelector;
+    const curP = props.gameState.getCurrentPlayer();
+
+    let onBuy = selector.onSelect.bind(null, ActionType.Buy);
+    let onTake = selector.onSelect.bind(null, ActionType.Take);
+    let onDiscard = selector.onSelect.bind(null, ActionType.Discard);
+    
+    return <div className={"DeckSelector ActionTypeSelector"}>
+            <Card 
+                cardId={selector.cardId} 
+                onCardBuy={onBuy}
+                onCardTake={onTake}
+                onCardDiscard={onDiscard}
+                skipFieldChecks={true}
+                currentPlayer={curP}
+                gs={props.gameState}
+            />
+        </div>
+}
+
 export default App;

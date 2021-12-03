@@ -54,7 +54,7 @@ export class GameState {
             this.fieldTop = [];
         }
         let drawAmount = initial ? this.players.length * 2 : 8 - (this.fieldTop.length + this.fieldBottom.length);
-        let [newDeck, drawnCards] = Helper.randomFromArray(this.cards[this.phase], drawAmount, this.seed);
+        let [newDeck, drawnCards] = Helper.randomFromArray(this.cards[this.phase], drawAmount, initial ? undefined : this.seed);
         this.cards[this.phase] = newDeck;
 
         this.fieldTop = drawnCards.concat(this.fieldTop);
@@ -241,19 +241,19 @@ export class Player {
         this.money += m;
         this.points += p;
     }
-    canTakeCard(cardId, gs) {
+    canTakeCard(cardId, gs, skipFieldCheck) {
         if (Cards.byId(cardId) == undefined) return false;
         // check if card  if on one of the field
         let cardsPossibleToTake = gs.fieldBottom.concat(gs.fieldTop);
         let cardIsOnAccessibleField = cardsPossibleToTake.includes(cardId);
-
+        
         // check if there is enough space in the player hand
         let handHasSpace = this.handCards.length < this.handSize;
 
-        return cardIsOnAccessibleField && handHasSpace;
+        return (cardIsOnAccessibleField || skipFieldCheck) && handHasSpace;
     }
 
-    canBuyCard(cardId, gs, exchangeId) {
+    canBuyCard(cardId, gs, exchangeId, skipFieldCheck) {
         if (Cards.byId(cardId) == undefined) return false;
         // check if card  if on one of the field
         let cardsPossibleToBuy = gs.fieldBottom.concat(gs.fieldTop).concat(this.handCards);
@@ -276,7 +276,7 @@ export class Player {
                 ? enoughMoney
                 : this.money >= this.priceForExchangeCard(cardId, gs, exchangeId)
         }
-        return cardIsOnAccessibleField && enoughMoney && exchangeCardValid && canBeExchanged;
+        return (cardIsOnAccessibleField || skipFieldCheck) && enoughMoney && exchangeCardValid && canBeExchanged;
 
     }
     canActivateCard(cardId, gs) {
@@ -287,10 +287,12 @@ export class Player {
         // check if card has action
         let card = Cards.byId(cardId);
         let hasAction = !!card.action;
-
+        // check if the phase matches with the card
+        let cardCategory = (Cards.byId(cardId).category == CardCategory.Exchange ? Cards.byId(cardId).upgradeCategory : Cards.byId(cardId).category)
+        let phaseMatches = (gs.phase == cardCategory)
         // check if card is deactivated
         let cardIsNotDeactivated = !this.disabledCards.includes(cardId);
-        return cardIsOnAccessibleField && hasAction && cardIsNotDeactivated;
+        return cardIsOnAccessibleField && hasAction && cardIsNotDeactivated && phaseMatches;
     }
     getPossibleUpgradesForCard(cardId) {
         let card = Cards.byId(cardId);

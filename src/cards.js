@@ -1,4 +1,6 @@
 import { CARDS, CardType } from "./cardIndex";
+import { ActionType } from "./App";
+import * as helper from './helper';
 
 export const CardCategory = {
     Worker:0,
@@ -184,7 +186,55 @@ cardsByType.set(CardType.Observatory, {
     points:1,
     money:0,
     category: CardCategory.Building,
-    action: ()=>{console.log("Observatory activated")}
+    action: (gs, turn) => {
+        let deckCategory = turn.payload.chosenDeck;
+        const cards = gs.cards[deckCategory]
+        const cardId = helper.randomFromArray(cards, 1, gs.seed)[1][0]
+        let actionType = turn.payload.actionType;
+        let curP = gs.getCurrentPlayer();
+        // remove card from deck
+        console.log("before card removal of index: ",cardId, gs.cards)
+        Object.keys(gs.cards).forEach(
+            key => {gs.cards[key] = gs.cards[key].filter(cId=>cId != cardId)});
+        console.log("after card removal", gs.cards)
+        switch(actionType){
+            case ActionType.Buy:
+                let price = curP.minPriceForCard(cardId, gs);
+                if (turn.payload.exchangeCardId !== undefined) {
+                    // window.app
+                    price = curP.priceForExchangeCard(cardId, gs, turn.payload.exchangeCardId);
+                }
+                curP.field.push(cardId);
+                curP.money -= price;
+            break;
+            case ActionType.Take: 
+                curP.handCards.push(cardId);
+            break;
+            case ActionType.Discard: break;
+        }
+        console.log("observatory activated")
+    },
+    getActionPayload: (gs) => {
+        const p = new Promise((resolve) => {
+            window.Actions.selectDeck().then((selectedDeck) => {
+                    const cards = gs.cards[selectedDeck]
+                    const randomCard = helper.randomFromArray(cards, 1, gs.seed)[1][0]
+                    window.Actions.selectActionTypeForCard(randomCard).then(
+                        (actionType) => {
+                            if(actionType == ActionType.Buy && Cards.byId(randomCard).category == CardCategory.Exchange){
+                                // now we still need to check for which card needs to be updated:
+                                GameField.letUserSelectExchangeCradId(randomCard, gs.getCurrentPlayer(), gs).then( (selectedCard)=>{
+                                    resolve({chosenDeck: selectedDeck, actionType: actionType, exchangeCardId: selectedCard})
+                                } )
+                            }else{
+                                resolve({chosenDeck: selectedDeck, actionType: actionType})
+                            }
+                        }
+                    )
+                })
+        });
+        return p;
+    }
 });
 
 cardsByType.set(CardType.Author, {

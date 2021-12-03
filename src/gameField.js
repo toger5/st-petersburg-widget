@@ -3,24 +3,28 @@ import { CardCategory, Cards } from "./cards";
 import "./Field.css";
 import { TurnType } from "./gameState";
 
-function Card(props) {
+export function Card(props) {
     let curP = props.currentPlayer;
+    let cardOwnerPlayer = props.cardOwnerPlayer;
     let gs = props.gs;
     let cardId = props.cardId;
     let cardObj = Cards.byId(cardId);
+    let skipFieldChecks = props.skipFieldChecks ?? false;
+    let cardGotActivatedInThisRound = cardOwnerPlayer?.disabledCards.includes(cardId);
+    
+    let onCardTake = curP?.canTakeCard(cardId, gs, skipFieldChecks)
+    ? props.onCardTake?.bind(null, cardId) : null;
 
-    let onCardTake = curP?.canTakeCard(cardId, gs)
-        ? props.onCardTake?.bind(null, cardId) : null;
-
-    let onCardBuy = curP?.canBuyCard(cardId, gs) 
+    let onCardBuy = curP?.canBuyCard(cardId, gs, undefined, skipFieldChecks)
         ? props.onCardBuy?.bind(null, cardId) : null;
-
+    
     let onCardActivate = curP?.canActivateCard(cardId, gs)
         ? props.onCardActivate?.bind(null, cardId) : null;
 
+    let onCardDiscard = props.onCardDiscard?.bind(null, cardId);
     let style = {};
     if (cardObj) {
-        style = { backgroundImage: `url(${cardObj.image}` };
+        style.backgroundImage = `url(${cardObj.image}`;
     }
     let cardSelector = props.cardSelector;
     let selectable = cardSelector?.optionCardIds.includes(cardId);
@@ -29,7 +33,9 @@ function Card(props) {
             <>
                 {onCardBuy && <button onClick={onCardBuy}>Buy</button>}
                 {onCardTake && <button onClick={onCardTake}>Take</button>}
+                {onCardDiscard && <button onClick={onCardDiscard}>Discard</button>}
                 {onCardActivate && <button onClick={onCardActivate}>Activate</button>}
+                {cardGotActivatedInThisRound && <div className="Activated">🚫</div>}
             </>
         }
         {selectable &&
@@ -61,6 +67,7 @@ function CardFieldRow(props) {
                     onCardActivate={onCardActivate}
                     key={index}
                     cardSelector={cardSelector}
+                    cardOwnerPlayer={props.cardOwnerPlayer}
                 />
             }
         )}
@@ -120,6 +127,7 @@ function PlayerBox(props) {
         cardIds={p.getSortedField()}
         onCardActivate={props.onCardActivate}
         cardSelector={cardSelector}
+        cardOwnerPlayer={p}
     />
     return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")}>
         <p>{idLabel}</p>
@@ -137,7 +145,19 @@ class GameField extends Component {
         super(props);
     }
     componentDidMount() { }
-
+    static letUserSelectExchangeCradId(cardId, currentPlayer, gameState){
+        const p = new Promise((resolve)=>{
+            if (!currentPlayer) { console.log("EEEEEEEE currentPlayer is undefined") }
+            let possibleUpgrades = currentPlayer.getPossibleUpgradesForCard(cardId);
+            let possiblePayableUpgrades = possibleUpgrades.filter((c) => currentPlayer.canBuyCard(cardId, gameState, c));
+            window.Actions.selectCard(possiblePayableUpgrades).then(
+                (selectedCard) => {
+                    resolve(selectedCard)
+                }
+            );
+        })
+        return p;
+    }
     render() {
         console.log("render field with props: ", this.props)
         let gs = this.props.gameState;
@@ -159,15 +179,19 @@ class GameField extends Component {
                 cardId: cardId
             }
             if (card.category == CardCategory.Exchange) {
-                if (!curP) { console.log("EEEEEEEE curP is undefined") }
-                let possibleUpgrades = curP.getPossibleUpgradesForCard(cardId);
-                let possiblePayableUpgrades = possibleUpgrades.filter((c) => curP.canBuyCard(cardId, gs, c));
-                window.Actions.selectCard(possiblePayableUpgrades).then(
-                    (selectedCard) => {
-                        turn["exchangeCardId"] = selectedCard;
-                        this.props.onTurn(turn);
-                    }
-                );
+                GameField.letUserSelectExchangeCradId(cardId, curP, gs).then( (selectedCard)=>{
+                    turn["exchangeCardId"] = selectedCard;
+                    this.props.onTurn(turn);
+                })
+                // if (!curP) { console.log("EEEEEEEE curP is undefined") }
+                // let possibleUpgrades = curP.getPossibleUpgradesForCard(cardId);
+                // let possiblePayableUpgrades = possibleUpgrades.filter((c) => curP.canBuyCard(cardId, gs, c));
+                // window.Actions.selectCard(possiblePayableUpgrades).then(
+                //     (selectedCard) => {
+                //         turn["exchangeCardId"] = selectedCard;
+                //         this.props.onTurn(turn);
+                //     }
+                // );
             } else {
                 this.props.onTurn(turn);
             }

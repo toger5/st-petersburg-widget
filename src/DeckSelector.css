@@ -1,0 +1,58 @@
+
+.DeckSelector {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    left: 40px;
+    top: 40px;
+    padding: 30px;
+    right: 40px;
+    background-color: white;
+    border-radius: 5px;
+    border: solid black 1px;
+}
+.ActionTypeSelector {
+    justify-content: center;
+    align-items: center;
+}
+/* .DeckSelector .DeckCategoryButton.Worker::before {
+    background-image: url(http://localhost:8081/51a50daf62a2b39c4bc1.png);
+    width: 50px;
+    height: 25px;
+    content: "";
+    position: absolute;
+    left: 0;
+    background-color: red;
+    background-position: center left;
+    background-size: contain;
+    top: 0;
+    bottom: 0;
+    background-position-x: left;
+    flex-grow: 1;
+    background-repeat: no-repeat;
+} */
+
+.DeckSelector .DeckCategoryButton{
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding-top: 18px;
+    padding-bottom: 18px;
+}
+.DeckSelector .DeckCategoryButton.Worker{
+    background-image: url(/res/worker.png);
+}
+.DeckSelector .DeckCategoryButton.Building {
+    background-image: url(/res/building.png);
+}
+.DeckSelector .DeckCategoryButton.Aristocrat{
+    background-image: url(/res/aristocrat.png);
+}
+.DeckSelector .DeckCategoryButton.Exchange{
+    background-image: url(/res/exchange.png);
+}
+
+.ActionTypeSelector .Card{
+    width: calc(82px * 2);
+    height: calc(135px * 2);
+}
