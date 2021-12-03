@@ -129,7 +129,7 @@ function PlayerBox(props) {
         cardSelector={cardSelector}
         cardOwnerPlayer={p}
     />
-    return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")}>
+    return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")+(expanded?" expanded":"")}>
         <p>{idLabel}</p>
         <div style={{ display: "flex", flexDirection: "row" }}>
             {playerInfo}
