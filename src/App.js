@@ -59,9 +59,6 @@ class App extends Component {
                     ev.preventDefault();
                     this.widgetApi.transport.reply(ev.detail, {});
                     console.log("ST_PETERSBURG_EVENT: ", ev)
-                    let stPetersEvent = events.filter(
-                        ev => ev.state_key == this.props.widgetId
-                    )[0];
                     // TODO always keep track of the previous event to than check if the turn was valid. 
                     // otherwise give the player form that turn the option to reset to that state.
                     // this is the only next event that is accepted by other clients
