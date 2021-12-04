@@ -269,15 +269,15 @@ class App extends Component {
         if(startState.getHash() != previousStartState.getHash()){
             cheatMessages.push({
                 msg: "A user changed the start state.",
-                details: "Changing the start state of the game messes with the history and makes it hard reconstruct the game."
+                details: "Changing the startState of the game makes it impossible reconstruct the game. As a consequence the history view wont work. And most likely someone cheated or there is a bug."
             })
         }
         // check that the correct player sended:
         let expected_sender = prev_gs.players.map(p => p.matrixId)[(prev_gs.currentPlayerIndex) % prev_gs.players.length]
         if (gs.sender != expected_sender) {
             cheatMessages.push({
-                msg: "A user tried to update the state who is not at turn.",
-                details: "last turn was:" + prev_gs.sender + " which implies that " + expected_sender + " is now at turn, but then " + gs.sender + " sent the next turn."
+                msg: "A user, who is not at turn, tried to update the state.",
+                details: "The last turn was:" + prev_gs.sender + " which implies that " + expected_sender + " is now at turn, but then " + gs.sender + " sent the next turn."
             })
         }
 
@@ -288,7 +288,7 @@ class App extends Component {
             // if (prev_gs.turns != gs.turns.slice(0, -1)) {
             cheatMessages.push({
                 msg: "The turn history from the previous state does not match",
-                details: "someone manually changed the turn history or added multiple turns to the end of the list"
+                details: "Someone manually changed the turn history or added multiple turns to the end of the turn list."
             })
         }
         let newTurn = gs.turns.slice(-1)[0];
@@ -296,7 +296,7 @@ class App extends Component {
         console.log("compared Game States\nPrevious:\n", prev_gs.getSendObj(), "\nCurrent:", gs.getSendObj())
         if (prev_gs.getHash() != gs.getHash()) {
             cheatMessages.push({
-                msg: "The state send does not match the expected state.",
+                msg: "The sent state does not match the expected state.",
                 details: "The turn applied to the previous state was: " + JSON.stringify(newTurn) + " and this does not result in the state sent by the sender"
             })
         }
@@ -304,7 +304,7 @@ class App extends Component {
             console.log("AAARRRG cheater with errors: " + cheatMessages.map(err => "\nMESSAGE: " + err.msg + "\nDETAILS: " + err.details))
             this.sendCheatAlert(cheatMessages, gs.sender);
         } else {
-            console.log("Uhh Lala this turn was done without cheating!! congratulation!")
+            console.log("Great, this turn was done without cheating!! congratulation!")
         }
     }
 
