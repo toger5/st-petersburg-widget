@@ -369,7 +369,6 @@ class App extends Component {
                             onTurn={this.makeTurn.bind(this)}
                             userId={this.userId}
                             cardSelector={this.state.cardSelector}
-                            controlsDisabled={!this.state.controlsDisabled || !!this.state.cardSelector}
                             onPass={this.makeTurn.bind(this, { type: TurnType.Pass })}
                             oneEnd={this.endGame.bind(this)}
                             gameStateHistory={this.state.gameStateHistory}

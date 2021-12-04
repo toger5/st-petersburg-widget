@@ -142,7 +142,7 @@ function PlayerBox(props) {
 
 function ControlElement(props) {
     return <div style={{ display: "flex", flexDirection: "row" }}>
-        <button disabled={props.disabled} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
+        <button disabled={!props.onPassClick} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
         {!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
         {!!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
         <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
@@ -221,10 +221,13 @@ class GameField extends Component {
                 this.props.onTurn(turn);
             })
         }
+        let onPass = this.props.onPass;
         if (!yourTurn || cardSelector != null) {
             onCardTake = null;
             onCardBuy = null;
             onCardActivate = null;
+            onPass = null;
+
         }
 
         return (
@@ -234,8 +237,7 @@ class GameField extends Component {
                     <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
                 </div>
                 <ControlElement
-                        disabled={this.props.controlsDisabled}
-                        onPassClick={this.props.onPass}
+                        onPassClick={onPass}
                         onEndClicked={this.props.onEnd}
                         gameStateHistory={this.props.gameStateHistory}
                         onActivateHistoryView={this.props.onHistoryToggle}
