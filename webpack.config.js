@@ -1,11 +1,19 @@
 const path = require('path');
-
+const pconf = require('./package.json')
+const webpack = require('webpack');
 module.exports = {
     entry: './src/main.js',
     output: {
         filename: 'main.js',
         path: path.resolve(__dirname, 'dist'),
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                PACKAGE_VERSION: '"' + pconf.version + '"'
+            }
+        }),
+    ],
     module: {
         rules: [
             {

@@ -361,7 +361,7 @@ class App extends Component {
             game =
                 <div>
                     <div>
-                        <GameHeader phase={gs.phase} cards={gs.cards}/>
+                        <GameHeader phase={gs.phase} cards={gs.cards}/><div className="version">version {process.env.PACKAGE_VERSION}</div>
                     </div>
                     {!isInHistoryView && 
                         <GameField

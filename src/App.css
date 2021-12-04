@@ -71,3 +71,11 @@
     font-size: xx-small;
     text-align: end;
 }
+
+.version{
+    font-size: x-small;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: grey;
+}
