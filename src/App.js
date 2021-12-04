@@ -374,7 +374,7 @@ class App extends Component {
                             userId={this.userId}
                             cardSelector={this.state.cardSelector}
                             onPass={this.makeTurn.bind(this, { type: TurnType.Pass })}
-                            oneEnd={this.endGame.bind(this)}
+                            onEnd={this.endGame.bind(this)}
                             gameStateHistory={this.state.gameStateHistory}
                             onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
                         />
