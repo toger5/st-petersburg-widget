@@ -8,6 +8,7 @@ export const CardCategory = {
     Building: 1,
     Aristocrat: 2,
     Exchange: 3,
+    label: (cat)=>["Worker", "Building", "Aristocrat", "Exchange"][cat]
 }
 
 export const Cards = {

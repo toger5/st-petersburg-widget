@@ -16,6 +16,7 @@ const stringHash = require("string-hash");
 
 const NOTIFY = true;
 const LOGGING = false;
+const SHOW_TURNS = false
 class App extends Component {
     constructor(props) {
         super(props);
@@ -124,10 +125,11 @@ class App extends Component {
         let gameState = new GameState(Array.from(this.state.selectedRoomMember));
         this.sendStPetersburgEvent(gameState, gameState.getHash(), gameState);
     }
-
     endGame() {
+        // if (confirm('Are you sure you want to end the game for all participaing players?')) {
         this.state.gameState.isGameOver = true;
         this.sendStPetersburgEvent(this.state.gameState, null, this.startState);
+        // }
     }
 
     makeTurn(turn) {
@@ -359,8 +361,6 @@ class App extends Component {
             game =
                 <div>
                     <div>
-                        {/* <p> Hello, {this.props.userId}! </p> */}
-                        {/* <p>{["Worker", "Building", "Aristocrat", "Exchange"][this.state.gameState.phase]}</p> */}
                         <GameHeader phase={gs.phase} cards={gs.cards}/>
                     </div>
                     {!isInHistoryView && 
@@ -369,27 +369,27 @@ class App extends Component {
                             onTurn={this.makeTurn.bind(this)}
                             userId={this.userId}
                             cardSelector={this.state.cardSelector}
+                            controlsDisabled={!this.state.controlsDisabled || !!this.state.cardSelector}
+                            onPass={this.makeTurn.bind(this, { type: TurnType.Pass })}
+                            oneEnd={this.endGame.bind(this)}
+                            gameStateHistory={this.state.gameStateHistory}
+                            onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
                         />
                     }
                     {isInHistoryView &&
-                    <>
-                        <div style={{ display: "flex", flexDirection: "row" }}>
-                            <button disabled={this.state.gameStateHistoryIndex <= 0} style={{ flexGrow: 1 }} onClick={this.prevHistory.bind(this)}>{"< Prev"}</button>
-                            <button disabled={this.state.gameStateHistoryIndex >= this.state.gameStateHistory.length - 1} style={{ flexGrow: 1 }} onClick={this.nextHistory.bind(this)}>{"Next >"}</button>
-                        </div>
-                        <GameField
-                            gameState={gs}
-                            userId={this.userId}
-                        />
-                    </>
+                        <>
+                            <div style={{ display: "flex", flexDirection: "row" }}>
+                                <button disabled={this.state.gameStateHistoryIndex <= 0} style={{ flexGrow: 1 }} onClick={this.prevHistory.bind(this)}>{"< Prev"}</button>
+                                <button disabled={this.state.gameStateHistoryIndex >= this.state.gameStateHistory.length - 1} style={{ flexGrow: 1 }} onClick={this.nextHistory.bind(this)}>{"Next >"}</button>
+                            </div>
+                            <GameField
+                                gameState={gs}
+                                userId={this.userId}
+                                gameStateHistory={this.state.gameStateHistory}
+                                onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
+                            />
+                        </>
                     }
-                    <ControlElement
-                        disabled={!this.state.yourTurn || !!this.state.cardSelector}
-                        onPassClick={this.makeTurn.bind(this, { type: TurnType.Pass })}
-                        onEndClicked={this.endGame.bind(this)}
-                        gameStateHistory={this.state.gameStateHistory}
-                        onActivateHistoryView={this.toggleHistoryView.bind(this, isInHistoryView)}
-                    />
 
                     {/* Selectors */}
                     {this.state.pubSelector && <PubActivationSelector pubSelector={this.state.pubSelector}/>}
@@ -402,7 +402,7 @@ class App extends Component {
                         </button>
                     }
 
-                    {gs.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>)}
+                    {SHOW_TURNS ? gs.turns.map((stEv, index) => <div key={index} style={{ fontFamily: "monospace" }}> {JSON.stringify(stEv)} </div>) : null}
                 </div>
         }
         let lock = this.state.lockUI;
@@ -414,14 +414,7 @@ class App extends Component {
         );
     }
 }
-function ControlElement(props) {
-    return <div style={{ display: "flex", flexDirection: "row" }}>
-        <button disabled={props.disabled} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
-        {!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
-        {!!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
-        <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
-    </div>;
-}
+
 function GameHeader(props) {
     let classNames = ["Worker", "Building", "Aristocrat", "Exchange"];
     let phases = [CardCategory.Worker, CardCategory.Building, CardCategory.Aristocrat, CardCategory.Exchange]

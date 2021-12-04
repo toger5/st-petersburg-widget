@@ -139,6 +139,15 @@ function PlayerBox(props) {
         {expanded && playerField}
     </div>
 }
+
+function ControlElement(props) {
+    return <div style={{ display: "flex", flexDirection: "row" }}>
+        <button disabled={props.disabled} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
+        {!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
+        {!!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
+        <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
+    </div>;
+}
 class GameField extends Component {
     constructor(props) {
         super(props);
@@ -220,6 +229,17 @@ class GameField extends Component {
 
         return (
             <>
+                <div className={'field' + (yourTurn ? ' yourTurn' : '') + " "+(CardCategory.label(gs.phase))} >
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
+                </div>
+                <ControlElement
+                        disabled={this.props.controlsDisabled}
+                        onPassClick={this.props.onPass}
+                        onEndClicked={this.props.onEnd}
+                        gameStateHistory={this.props.gameStateHistory}
+                        onActivateHistoryView={this.props.onHistoryToggle}
+                    />
                 <div className={'playerArea'} style={{ display: "flex" }}>
                     {gs.players.map((p) => {
                         return <PlayerBox
@@ -234,10 +254,6 @@ class GameField extends Component {
                         />
                     }
                     )}
-                </div>
-                <div className={'field' + (yourTurn ? ' yourTurn' : '')} >
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
                 </div>
             </>
         );

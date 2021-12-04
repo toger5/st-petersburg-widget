@@ -5,15 +5,19 @@
     padding: 10px;
     display: flex;
     margin: 10px;
-    opacity: 0.5;
+    border-width: 3px;
+    border-color: white;
+    border-style: solid;
+    opacity: 0.7;
     transition-duration: 0.5s;
 }
-.field.yourTurn{
+.field.Worker    {background-color: #47904840;}
+.field.Building  {background-color: #3991d040;}
+.field.Aristocrat{background-color: #991e222c;}
+.field.Exchange  {background-color: #adadad40;}
+.field.yourTurn {
     opacity: 1;
     transition-duration: 0.5s;
-    border-style: solid;
-    border-width: 3px;
-    padding: 7px;
     border-color: #bb7a45;
 }
 .field .card{
@@ -48,7 +52,7 @@
 .playerBox {
     margin: 3px;
     padding: 5px;
-    border-width: 8px;
+    border-width: 3px;
     border-radius: 8px;
     border-color: #f2f5f8;
     background-color: white;
@@ -56,10 +60,16 @@
     position: relative;
     overflow-x: scroll;
     scrollbar-width: thin;
+    transition-duration: 1s;
+    scrollbar-color: gray white;
+}
+.playerBox.expanded{
+    overflow: hidden;
 }
 .playerBox.current {
-    padding: 11px;
-    border-width: 2px;
+    transition-duration: 1s;
+    background-color: #f7f0e4;
+    border-width: 3px;
     border-color: #bb7a45;
     border-style: solid
 }
