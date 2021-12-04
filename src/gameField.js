@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { CardCategory, Cards } from "./cards";
 import "./Field.css";
 import { TurnType } from "./gameState";
-
 export function Card(props) {
     let curP = props.currentPlayer;
     let cardOwnerPlayer = props.cardOwnerPlayer;
@@ -24,11 +23,11 @@ export function Card(props) {
     let onCardDiscard = props.onCardDiscard?.bind(null, cardId);
     let style = {};
     if (cardObj) {
-        style.backgroundImage = `url(${cardObj.image}`;
+        style.backgroundImage = `url(${cardObj.image})`;
     }
     let cardSelector = props.cardSelector;
     let selectable = cardSelector?.optionCardIds.includes(cardId);
-    return <div className={"card" + (cardObj ? " image" : "") + (selectable ? " selectable" : "")} style={style}>
+    return <div className={"card" + (selectable ? " selectable" : "")} style={style}>
         {(cardObj && !cardSelector) &&
             <>
                 {onCardBuy && <button onClick={onCardBuy}>Buy</button>}

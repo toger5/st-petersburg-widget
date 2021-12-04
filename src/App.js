@@ -419,7 +419,7 @@ function ControlElement(props) {
         <button disabled={props.disabled} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
         {!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
         {!!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
-        <button style={{ flexGrow: 1 }} onClick={props.onEndClicked}>End Game</button>
+        <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
     </div>;
 }
 function GameHeader(props) {

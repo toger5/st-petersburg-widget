@@ -3,7 +3,7 @@
     flex-direction: column;
 }
 .GameHeader {
-    /* background-color: blue; */
+    justify-content: center;
     display: flex;
 }
 .GameHeader div {

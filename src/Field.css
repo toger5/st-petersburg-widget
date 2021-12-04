@@ -1,6 +1,7 @@
 .field {
-    background-color: #f2f5f8;
+    /* background-color: #f2f5f8; */
     flex-direction: column;
+    border-radius: 8px;
     padding: 10px;
     display: flex;
     margin: 10px;
@@ -12,7 +13,8 @@
     transition-duration: 0.5s;
     border-style: solid;
     border-width: 3px;
-    border-color: hotpink;
+    padding: 7px;
+    border-color: #bb7a45;
 }
 .field .card{
     flex-shrink: unset;
@@ -58,7 +60,7 @@
 .playerBox.current {
     padding: 11px;
     border-width: 2px;
-    border-color: hotpink;
+    border-color: #bb7a45;
     border-style: solid
 }
 .playerBox p{
@@ -107,13 +109,17 @@
     border-color: red;
     border-width: 2px;
     border-radius: 4px;
-    box-shadow: 0 0 7px rgb(160, 160, 160);
+    /* box-shadow: 0 0 7px rgb(160, 160, 160); */
     padding: 0px;
     margin: 5px;
     width: 55px;
     height: 90px;
     width: 82px;
     height: 135px;
+    background-image: url(/res/cardBg2.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 .card .Activated{
     width: 100%;
@@ -144,13 +150,11 @@
 
 .card button{
     text-align: center;
-    /* display:none; */
-    margin: 10px;
+    margin: 3px;
     opacity: 0;
     background-color: rgba(197, 197, 197, 0.479);
     color: white;
     font-weight: 800;
-    padding: 4px;
     border: none;
     border-radius: 16px;
     transition-duration: 0.5s;
@@ -166,11 +170,7 @@
     transition-duration: 0.5s;
     border-radius: 3px;
 }
-.card.image{
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
+
 .card.selectable{
     border-width: 3px;
     border-color: rgb(165, 241, 77);
