@@ -1,10 +1,8 @@
 .field {
-    /* background-color: #f2f5f8; */
     flex-direction: column;
     border-radius: 8px;
     padding: 10px;
     display: flex;
-    margin: 10px;
     border-width: 3px;
     border-color: white;
     border-style: solid;
