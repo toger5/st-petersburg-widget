@@ -86,7 +86,7 @@ cardsByType.set(CardType.CustomsHouse, {
 	type: CardType.CustomsHouse,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/building_customs_house_EN.jpg",
     price:8,
-    points:12,
+    points:2,
     money:0,
     category:CardCategory.Building,
 });
