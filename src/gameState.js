@@ -312,7 +312,8 @@ export class Player {
 
         // discount from other cards
         let buyCard = Cards.byId(cardId);
-        discount += this.field.filter(c => Cards.byId(c).discountCategory == buyCard.category).length;
+        let buyCardCategory = buyCard.category == CardCategory.Exchange ? buyCard.upgradeCategory : buyCard.category;
+        discount += this.field.filter(c => Cards.byId(c).discountCategory == buyCardCategory).length;
 
         // discount from fieldBottom
         discount += gs.fieldBottom.includes(cardId) ? 1 : 0;
