@@ -40,11 +40,11 @@ class App extends Component {
         this.state = {
             roomMembers: [],
             selectedRoomMember: new Set(),
-            // turns: [],
             gameState: new GameState(),
             yourTurn: false,
             lockUI: false,
             gameStateHistory: undefined,
+            showGameStateHistory: false,
             gameStateHistoryIndex: 0,
             cardSelector: undefined,
             deckSelector: undefined,
@@ -293,11 +293,21 @@ class App extends Component {
         }
 
         this.startState = startState,
+        // HISTORY:
+        let history;
+        if(!this.state.gameStateHistory){
+            history = GameState.createGameStateHistory(this.startState, newGs.turns);
+        } else {
+            history = this.state.gameStateHistory.concat(App.cloneGameState(newGs));
+        }
+
         this.setState({
             lockUI: false,
             gameState: newGs,//Object.assign(oldGs, newGsContent),
-            yourTurn: newGs.getCurrentPlayer().matrixId == this.userId
+            yourTurn: newGs.getCurrentPlayer().matrixId == this.userId,
+            gameStateHistory: history,
         });
+
     }
     validateGameState(gs, prev_gs, startState, previousStartState) {
         let cheatMessages = [];
@@ -363,15 +373,15 @@ class App extends Component {
         })
     }
     toggleHistoryView(isInHistoryView){
+        console.log("gameStateHistory", this.state.gameStateHistory)
         if(isInHistoryView){
             this.setState({
-                gameStateHistory: undefined,
+                showGameStateHistory: false,
             })
         }else{
-            const hist = GameState.createGameStateHistory(this.startState, this.state.gameState.turns);
             this.setState({
-                gameStateHistoryIndex: Math.max(hist.length - 1, 0),
-                gameStateHistory: hist,
+                gameStateHistoryIndex: Math.max(this.state.gameStateHistory.length - 1, 0),
+                showGameStateHistory: true,
             })
         }
     }
@@ -399,17 +409,17 @@ class App extends Component {
             onPlayerChanged={this.playerChanged.bind(this)}
             roomMembers={this.state.roomMembers}
         />
-        const isInHistoryView = !!this.state.gameStateHistory
         let game;
         if (this.gameRunning()) {
-            let gs = isInHistoryView ? this.state.gameStateHistory[this.state.gameStateHistoryIndex] : this.state.gameState
+            let gs = this.state.showGameStateHistory ? this.state.gameStateHistory[this.state.gameStateHistoryIndex] : this.state.gameState
             game =
                 <div>
                     <div>
                         <GameHeader phase={gs.phase} cards={gs.cards}/><div className="version">version {process.env.PACKAGE_VERSION}</div>
                     </div>
-                    {!isInHistoryView && 
+                    {!this.state.showGameStateHistory && 
                         <GameField
+                            history={this.state.gameStateHistory}
                             gameState={gs}
                             onTurn={this.makeTurn.bind(this)}
                             userId={this.userId}
@@ -417,11 +427,12 @@ class App extends Component {
                             onPass={this.makeTurn.bind(this, { type: TurnType.Pass })}
                             onEnd={this.endGame.bind(this)}
                             gameStateHistory={this.state.gameStateHistory}
-                            onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
+                            showGameStateHistory={false}
+                            onHistoryToggle={this.toggleHistoryView.bind(this, this.state.showGameStateHistory)}
                             showCardId={this.state.SHOW_CARD_ID}
                         />
                     }
-                    {isInHistoryView &&
+                    {this.state.showGameStateHistory &&
                         <>
                             <div style={{ display: "flex", flexDirection: "row" }}>
                                 <button disabled={this.state.gameStateHistoryIndex <= 0} style={{ flexGrow: 1 }} onClick={this.prevHistory.bind(this)}>{"< Prev"}</button>
@@ -430,8 +441,9 @@ class App extends Component {
                             <GameField
                                 gameState={gs}
                                 userId={this.userId}
+                                showGameStateHistory={true}
                                 gameStateHistory={this.state.gameStateHistory}
-                                onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
+                                onHistoryToggle={this.toggleHistoryView.bind(this, this.state.showGameStateHistory)}
                                 showCardId={this.state.SHOW_CARD_ID}
                             />
                         </>

@@ -1,0 +1,18 @@
+.cardPreview{
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0;
+    width: 50px;
+    height: 60px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.exchangeIcon{
+    font-size: large;
+    color: rgb(184, 156, 106);
+}
+.turnDrawer{
+    border-radius: 8px;
+    /* border: solid 2px grey; */
+}

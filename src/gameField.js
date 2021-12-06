@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { CardCategory, Cards } from "./cards";
 import "./Field.css";
 import { TurnType } from "./gameState";
+import { TurnDrawer } from "./turnDrawer";
+
 export function Card(props) {
     let curP = props.currentPlayer;
     let cardOwnerPlayer = props.cardOwnerPlayer;
@@ -68,6 +70,7 @@ function CardFieldRow(props) {
                     key={index}
                     cardSelector={cardSelector}
                     cardOwnerPlayer={props.cardOwnerPlayer}
+                    showCardId={props.showCardId}
                 />
             }
         )}
@@ -128,13 +131,14 @@ function PlayerBox(props) {
         onCardActivate={props.onCardActivate}
         cardSelector={cardSelector}
         cardOwnerPlayer={p}
+        showCardId={props.showCardId}
     />
     return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")+(expanded?" expanded":"")}>
         <p>{idLabel}</p>
         <div style={{ display: "flex", flexDirection: "row" }}>
             {playerInfo}
 
-            <CardFieldRow className={"hand"} currentPlayer={curP} gs={gs} cardIds={handCards} onCardBuy={props.onCardBuy} cardSelector={cardSelector} />
+            <CardFieldRow className={"hand"} currentPlayer={curP} gs={gs} cardIds={handCards} onCardBuy={props.onCardBuy} cardSelector={cardSelector} showCardId={props.showCardId}/>
             {!expanded && playerField}
         </div>
         {expanded && playerField}
@@ -144,8 +148,8 @@ function PlayerBox(props) {
 function ControlElement(props) {
     return <div style={{ display: "flex", flexDirection: "row" }}>
         <button disabled={!props.onPassClick} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
-        {!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>History View</button>}
-        {!!props.gameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onActivateHistoryView}>Gameplay View</button>}
+        {!props.showGameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>History View</button>}
+        {!!props.showGameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>Gameplay View</button>}
         <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
     </div>;
 }
@@ -233,15 +237,16 @@ class GameField extends Component {
 
         return (
             <>
+                {/* <TurnDrawer turn={gs.turns[gs.turns.length - 1]} prevState={this.props.history[-1]}></TurnDrawer> */}
                 <div className={'field' + (yourTurn ? ' yourTurn' : '') + " "+(CardCategory.label(gs.phase))} >
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} />
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardId={this.props.showCardId}/>
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardId={this.props.showCardId}/>
                 </div>
                 <ControlElement
                         onPassClick={onPass}
                         onEndClicked={this.props.onEnd}
-                        gameStateHistory={this.props.gameStateHistory}
-                        onActivateHistoryView={this.props.onHistoryToggle}
+                        showGameStateHistory={this.props.showGameStateHistory}
+                        onHistoryViewClick={this.props.onHistoryToggle}
                     />
                 <div className={'playerArea'} style={{ display: "flex" }}>
                     {gs.players.map((p) => {
@@ -254,6 +259,7 @@ class GameField extends Component {
                             onCardBuy={onCardBuy?.bind(this)}
                             onCardActivate={onCardActivate?.bind(this)}
                             cardSelector={cardSelector}
+                            showCardId={this.props.showCardId}
                         />
                     }
                     )}
