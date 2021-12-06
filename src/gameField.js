@@ -21,8 +21,9 @@ export function Card(props) {
         ? props.onCardActivate?.bind(null, cardId) : null;
 
     let onCardDiscard = props.onCardDiscard?.bind(null, cardId);
-    let style = {};
+    let style = {color: "white"};
     if (cardObj) {
+        color: "white";
         style.backgroundImage = `url(${cardObj.image})`;
     }
     let cardSelector = props.cardSelector;
@@ -40,7 +41,7 @@ export function Card(props) {
         {selectable &&
             <button onClick={cardSelector.onSelect.bind(null, cardId)}>Select</button>
         }
-
+        {props.showCardId && cardId}
 
     </div>
 }

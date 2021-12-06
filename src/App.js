@@ -16,7 +16,7 @@ const stringHash = require("string-hash");
 
 const NOTIFY = true;
 const LOGGING = false;
-const SHOW_TURNS = false
+const SHOW_TURNS = false;
 class App extends Component {
     constructor(props) {
         super(props);
@@ -30,6 +30,12 @@ class App extends Component {
             selectActionTypeForCard: this.selectActionTypeForCard.bind(this),
             selectCard: this.selectCard.bind(this),
             selectPubActivationCount: this.selectPubActivationCount.bind(this),
+            setAppState: (newState)=>{this.setState(newState)},
+            toggleSetting: (setting)=>{
+                let newState = {}
+                newState[setting] = !this.state[setting];
+                this.setState(newState)
+            }
         }
         this.state = {
             roomMembers: [],
@@ -44,7 +50,8 @@ class App extends Component {
             deckSelector: undefined,
             actionTypeSelector: undefined,
             // trashSelector: undefied,
-            pubSelector: undefined
+            pubSelector: undefined,
+            SHOW_CARD_ID: false,
         };
     }
     test = 10;
@@ -377,6 +384,7 @@ class App extends Component {
                             onEnd={this.endGame.bind(this)}
                             gameStateHistory={this.state.gameStateHistory}
                             onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
+                            showCardId={this.state.SHOW_CARD_ID}
                         />
                     }
                     {isInHistoryView &&
@@ -390,6 +398,7 @@ class App extends Component {
                                 userId={this.userId}
                                 gameStateHistory={this.state.gameStateHistory}
                                 onHistoryToggle={this.toggleHistoryView.bind(this, isInHistoryView)}
+                                showCardId={this.state.SHOW_CARD_ID}
                             />
                         </>
                     }
