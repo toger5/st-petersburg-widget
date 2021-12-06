@@ -310,8 +310,7 @@ cardsByType.set(CardType.CarpenterWorkshop, {
     money:3,
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Worker,
-    upgradeCards: [CardType.Lumberack, CardType.CzarAndCarpenter],
-    discountCategory: CardType.Building,
+    discountCategory: CardCategory.Building,
 });
 
 cardsByType.set(CardType.GoldSmelter, {
@@ -323,7 +322,7 @@ cardsByType.set(CardType.GoldSmelter, {
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Worker,
     upgradeCards: [CardType.Goldminer, CardType.CzarAndCarpenter],
-    discountCategory: CardType.Aristocrat,
+    discountCategory: CardCategory.Aristocrat,
 });
 
 cardsByType.set(CardType.WeavingMill, {
