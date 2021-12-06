@@ -19,8 +19,8 @@ export const Cards = {
 const cardsByType = new Map();
 
 
-cardsByType.set(CardType.Lumberack, {
-	type: CardType.Lumberack,
+cardsByType.set(CardType.Lumberjack, {
+	type: CardType.Lumberjack,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/worker_lumberjack_EN.jpg",
     price:3,
     points:0,
@@ -310,6 +310,7 @@ cardsByType.set(CardType.CarpenterWorkshop, {
     money:3,
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Worker,
+    upgradeCards: [CardType.Lumberjack, CardType.CzarAndCarpenter],
     discountCategory: CardCategory.Building,
 });
 

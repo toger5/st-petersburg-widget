@@ -1,6 +1,6 @@
 
 export const CardType = {
-    Lumberack: 0,
+    Lumberjack: 0,
     Goldminer: 1,
     Sheperd: 2,
     FurTrapper: 3,
@@ -55,12 +55,12 @@ export const CardType = {
 }
 
 export const INDEX_WORKER = [
-    CardType.Lumberack,
-    CardType.Lumberack,
-    CardType.Lumberack,
-    CardType.Lumberack,
-    CardType.Lumberack,
-    CardType.Lumberack,
+    CardType.Lumberjack,
+    CardType.Lumberjack,
+    CardType.Lumberjack,
+    CardType.Lumberjack,
+    CardType.Lumberjack,
+    CardType.Lumberjack,
     CardType.Goldminer,
     CardType.Goldminer,
     CardType.Goldminer,
