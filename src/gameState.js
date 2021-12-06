@@ -328,14 +328,13 @@ export class Player {
     }
     
     minPriceForCard(cardId, gs) {
-
         let discount = this.discountsForCard(cardId, gs);
         let buyCard = Cards.byId(cardId);
         let price = Math.max(buyCard.price - discount, 1)
         if (buyCard.category == CardCategory.Exchange) {
             let exchangeOptions = this.getPossibleUpgradesForCard(cardId);
             let cheapestExchangeCardId = exchangeOptions.sort((a, b) =>{
-                this.priceForExchangeCard(cardId,gs,b) - this.priceForExchangeCard(cardId,gs,a)
+                return this.priceForExchangeCard(cardId,gs,a) - this.priceForExchangeCard(cardId,gs,b)
             } )[0]
             if(cheapestExchangeCardId){
                 price = this.priceForExchangeCard(cardId, gs, cheapestExchangeCardId);
