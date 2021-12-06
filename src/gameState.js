@@ -127,13 +127,14 @@ export class GameState {
             }
             case TurnType.BuyCard: {
                 const curP = this.getCurrentPlayer();
+
                 let price = curP.minPriceForCard(turn.cardId, this);
-                this.removeCardFromGame(turn.cardId);
                 if (turn.exchangeCardId != null) {
-                    // window.app
                     price = curP.priceForExchangeCard(turn.cardId, this, turn.exchangeCardId);
                     this.removeCardFromGame(turn.exchangeCardId);
                 }
+
+                this.removeCardFromGame(turn.cardId);
                 curP.field.push(turn.cardId);
                 curP.money -= price;
                 this.nextPlayer();
