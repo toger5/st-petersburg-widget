@@ -151,6 +151,9 @@ export class GameState {
         }
         if(this.isPlayedToEnd()){
             this.isGameOver = true;
+            for(let p of this.players){
+                p.aristocratPoints()
+            }
             // make the final point calculations for aristocrats!
 
         }
@@ -191,6 +194,62 @@ export class GameState {
             gs.seed = prevStateHash;
         }
         return states;
+    }
+    static gameSummary(startState, turns){
+        let playerSummarys = []
+        for(let p of startState.players){
+            playerSummarys.push({
+                points: 0,
+                money: 0,
+                pointsFromMoney: 0,
+                matrixId: p.matrixId,
+                pointsWorker: 0,
+                moneyWorker: 0,
+                pointsBuildings: 0,
+                moneyBuildings: 0,
+                pointsAristocrats: 0,
+                moneyAristocrats: 0,
+                pointsFinalAristocrats: 0,
+                countFinalAristocrats: 0,
+            });
+        }
+        const history = createGameStateHistory(startState, turns);
+        for(let i = 0; i < history.length;i++){
+            let gs = history[i];
+            let prevGs;
+            if(i > 1){prevGs = history[i-1];}
+            if(prevGs){
+                for(let pIndex, p of playerSummarys.entries()){
+                    if(prevGs.phase != gs.phase && !gs.isGameOver){
+                        switch(prevGs.phase){
+                            case CardCategory.Worker:
+                                p.moneyWorker += prevGs.players[pIndex].money - gs.players[pIndex].money;
+                                p.pointsWorker += prevGs.players[pIndex].points - gs.players[pIndex].points;
+                            break;
+                            case CardCategory.Building:
+                                p.moneyBuildings += prevGs.players[pIndex].money - gs.players[pIndex].money;
+                                p.pointsBuildings += prevGs.players[pIndex].points - gs.players[pIndex].points;
+                            case CardCategory.Aristocrat:
+                                p.moneyAristocrats += prevGs.players[pIndex].money - gs.players[pIndex].money;
+                                p.pointsAristocrats += prevGs.players[pIndex].points - gs.players[pIndex].points;
+                            break;
+                        }
+                    }
+                    if(gs.isGameOver){
+                        p.pointsFinalAristocrats = prevGs.players[pIndex].points - gs.players[pIndex].points;
+                        p.pointsFromMoney = Math.floor(gs.players[pIndex].money/10);
+                        p.points = gs.players[pIndex].points + p.pointsFromMoney;
+                        p.countFinalAristocrats = gs.players[pIndex].aristocratsCount();
+                        p.money = gs.players[pIndex].money;
+                    }
+                }
+            }
+        }
+
+        return {
+            amountTurns: turn.length,
+            playerSummarys: playerSummarys.sort((a,b)=>b.points-a.points) // sorted so that first player is winner
+        };
     }
 }
 export const TurnType = {
@@ -241,6 +300,19 @@ export class Player {
         this.money += m;
         this.points += p;
         this.disabledCards = [];
+    }
+    aristocratsCount(){
+        let aristocrats = this.handCards.filter((cardId)=>{
+            let card = Cards.byId(cardId);
+            return card.category == CardCategory.Aristocrat || 
+                (card.category == CardCategory.Exchange && card.upgradeCategory == CardCategory.Aristocrat);
+        })
+        const aristocratSet = new Set(aristocrats);
+        return Array.from(aristocratSet).length;
+    }
+    aristocratPoints(){
+        let ariCount = this.aristocratsCount();
+        this.points += Math.min((ariCount + 1) * (ariCount/2), 55)
     }
     canTakeCard(cardId, gs, skipFieldCheck) {
         if (!Cards.byId(cardId)) return false;

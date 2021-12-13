@@ -117,6 +117,29 @@ class App extends Component {
             "format": "org.matrix.custom.html",
             "formatted_body": "🕍 <a href=\"https://matrix.to/#/"+gameState.getCurrentPlayer().matrixId+"\">"+gameState.getCurrentPlayer().matrixId+"</a> It's your turn!<br><em>Sent from the St. Petersburg Widget</em>"
         }
+        if(gameState.isGameOver){
+            let summary = GameState.gameSummary(startState, gameState.turns)
+            roomNotifyContent = {
+                "msgtype": "m.text",
+                "body": "🕍 " + gameState.getCurrentPlayer().matrixId + " It's your turn!\n_Sent from the St. Petersburg Widget_",
+                "format": "org.matrix.custom.html",
+                "formatted_body": 
+                "🕍 The Game is Over:\n" +
+                "<a href=\"https://matrix.to/#/"+summary.playerSummarys[0].matrixId+"\">"+summary.playerSummarys[0].matrixId+"</a><strong>Absolutly dominated the competition!</strong> and won this game.<br>"+
+                summary.playerSummarys.entries().map(i,p =>
+                    "<h3>"+i+". Place <a href=\"https://matrix.to/#/@toger5:matrix.org\">Timo K.</a></h3>\n"+
+                    "<p>with "+p.points+" points:</p>\n"+
+                    "<ul>"+
+                    "<li><strong>final evaluation</strong>\n"+
+                    "<ul>\n<li>("+p.countFinalAristocrats+" Aristocrats): "+p.pointsFinalAristocrats+"</li>\n"+
+                    "<li>("+p.money+" Rubel): "+p.pointsFromMoney+"</li>\n</ul>\n</li>\n"+
+                    "<li><strong>Worker</strong>: "+p.pointsWorker+"</li>\n"+
+                    "<li><strong>Buildings</strong>: "+p.pointsBuildings+"</li>\n"+
+                    "<li><strong>Aristocrats</strong>: "+p.pointsAristocrats+"</li>"+
+                    +"</ul>\n") +
+                "<br><em>Sent from the St. Petersburg Widget</em>"
+            }
+        }
         this.widgetApi.sendStateEvent(ST_PETERSBURG_EVENT_NAME, this.props.widgetId, content);
         if (LOGGING) this.widgetApi.sendRoomEvent("m.room.message", roomMessageContent, "");
         if (NOTIFY) this.widgetApi.sendRoomEvent("m.room.message", roomNotifyContent, "");
