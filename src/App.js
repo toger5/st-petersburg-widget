@@ -264,10 +264,10 @@ class App extends Component {
             // here we dont care about the seed
         }
 
+        this.startState = startState,
         this.setState({
             lockUI: false,
             gameState: newGs,//Object.assign(oldGs, newGsContent),
-            startState: startState,
             yourTurn: newGs.getCurrentPlayer().matrixId == this.userId
         });
     }
