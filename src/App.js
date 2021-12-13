@@ -239,7 +239,6 @@ class App extends Component {
             if (evData.unsigned?.prev_content?.gameState) {
                 // handle from "readEvent" callback
                 this.prev_gameState = App.cloneGameState(evData.unsigned?.prev_content?.gameState)
-                this.startState = App.cloneGameState(evData.unsigned?.prev_content?.startState);
                 this.prev_gameState.sender = evData.unsigned?.prev_sender;
                 this.prev_gameState.seed = evData.unsigned?.prev_content.hash;
             } else if (this.prev_gameState) {
@@ -249,13 +248,16 @@ class App extends Component {
                 this.prev_gameState.sender = this.state.gameState.sender;
                 this.prev_gameState.seed = seed;
             } else {
-                console.error("somehow there is no prev GameState")
+                console.error("There is no prev GameState so we calculate it from the history")
+                let hist = GameState.createGameStateHistory(startState, newGs.turns);
+                this.prev_gameState = App.cloneGameState(hist[hist.length - 2]);
+                this.prev_gameState.sender = hist[hist.length - 3].getCurrentPlayer().matrixId;
+                this.prev_gameState.seed = hist[hist.length - 3].getHash();
             }
             newGs.seed = this.prev_gameState.getHash();
             this.validateGameState(newGs, this.prev_gameState, startState, this.startState)
         } else if (newGs.turns.length == 0) {
             console.log("-----GAME-----INITIALIZED-----,\n not validating the state since it seems to be the initial event")
-            this.startState = startState;
             newGs.seed = evData.content.hash; // getting the hash from the init event for the next round
         } else if (newGs.isGameOver) {
             console.log("-----GAME-----ENDED-----,\n not validating the state since the game is finished")
@@ -273,11 +275,15 @@ class App extends Component {
         let cheatMessages = [];
 
         // check that start state was not altered:
-        if(startState.getHash() != previousStartState.getHash()){
-            cheatMessages.push({
-                msg: "A user changed the start state.",
-                details: "Changing the startState of the game makes it impossible reconstruct the game. As a consequence the history view wont work. And most likely someone cheated or there is a bug."
-            })
+        if(previousStartState){
+            if(startState.getHash() != previousStartState.getHash()){
+                cheatMessages.push({
+                    msg: "A user changed the start state.",
+                    details: "Changing the startState of the game makes it impossible reconstruct the game. As a consequence the history view wont work. And most likely someone cheated or there is a bug."
+                })
+            }
+        }else{
+            console.log("could not check start state, this is the first even received with this session so the prev start state could not be stored.")
         }
         // check that the correct player sended:
         let expected_sender = prev_gs.players.map(p => p.matrixId)[(prev_gs.currentPlayerIndex) % prev_gs.players.length]
