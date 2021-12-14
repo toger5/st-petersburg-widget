@@ -120,18 +120,19 @@ class App extends Component {
         if(gameState.isPlayedToEnd){
             let summary = GameState.gameSummary(startState, gameState.turns)
             let summaryPlayerTextList = summary.playerSummarys.map((p,i) =>
-            "<h3>"+(i+1)+". Place <a href=\"https://matrix.to/#/"+summary.playerSummarys[i].matrixId+"\">"+summary.playerSummarys[i].matrixId+"</a></h3>\n"+
-            "<p>with "+p.points+" points:</p>\n"+
+            "<strong>"+(i+1)+". Place <a href=\"https://matrix.to/#/"+summary.playerSummarys[i].matrixId+"\">"+summary.playerSummarys[i].matrixId+"</a></strong>\n"+
+            "<p>with <strong>"+p.points+"</strong> points:</p>\n"+
             "<ul>"+
-            "<li><strong>final evaluation</strong>\n"+
+            "<li><strong>Final settlement:</strong>\n"+
                 "<ul>"+
-                    "<li>("+p.countFinalAristocrats+" Aristocrats): "+p.pointsFinalAristocrats+"</li>"+
-                    "<li>("+p.money+" Rubel): "+p.pointsFromMoney+"</li>"+
+                    "<li>Aristocrats ("+p.countFinalAristocrats+"): "+p.pointsFinalAristocrats+" Point/s</li>"+
+                    "<li>Rubel ("+p.money+"): "+p.pointsFromMoney+" Point/s</li>"+
+                    "<li>Hand Cards ("+p.countFinalHandCards+"): "+p.pointsFinalHandCards+" Point/s</li>"+
                 "</ul>"+
             "</li>\n"+
-            "<li><strong>Worker</strong>: "+p.pointsWorker+"</li>\n"+
-            "<li><strong>Buildings</strong>: "+p.pointsBuildings+"</li>\n"+
-            "<li><strong>Aristocrats</strong>: "+p.pointsAristocrats+"</li>"+
+            "<li><strong>Worker</strong>: "+p.pointsWorker+ " Point/s</li>\n"+
+            "<li><strong>Buildings</strong>: "+p.pointsBuildings+" Point/s</li>\n"+
+            "<li><strong>Aristocrats</strong>: "+p.pointsAristocrats+" Point/s</li>"+
             "</ul>")
             roomNotifyContent = {
                 "msgtype": "m.text",

@@ -214,6 +214,8 @@ export class GameState {
                 moneyAristocrats: 0,
                 pointsFinalAristocrats: 0,
                 countFinalAristocrats: 0,
+                pointsFinalHandCards: 0,
+                countFinalHandCards: 0,
             });
         }
         const history = GameState.createGameStateHistory(startState, turns);
@@ -241,9 +243,11 @@ export class GameState {
                     }
                     if(gs.isGameOver){
                         p.pointsFinalAristocrats = gs.players[pIndex].points - prevGs.players[pIndex].points;
-                        p.pointsFromMoney = Math.floor(gs.players[pIndex].money/10);
-                        p.points = gs.players[pIndex].points + p.pointsFromMoney;
                         p.countFinalAristocrats = gs.players[pIndex].aristocratsCount();
+                        p.countFinalHandCards = gs.players[pIndex].handCards.length;
+                        p.pointsFinalHandCards = -5 * p.pointsFinalHandCards;
+                        p.pointsFromMoney = Math.floor(gs.players[pIndex].money/10);
+                        p.points = gs.players[pIndex].points + p.pointsFromMoney + p.pointsFinalHandCards;
                         p.money = gs.players[pIndex].money;
                     }
                 }
