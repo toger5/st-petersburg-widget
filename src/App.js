@@ -465,7 +465,7 @@ function GameHeader(props) {
     let phases = [CardCategory.Worker, CardCategory.Building, CardCategory.Aristocrat, CardCategory.Exchange]
     return <div className={"GameHeader"}>
         {phases.map(p =>{
-            return <div className={classNames[p]+" "+(props.phase == p ? "current":"")}>
+            return <div key={p} className={classNames[p]+" "+(props.phase == p ? "current":"")}>
                 <p>{props.cards[p].length}</p>
             </div>
         })}
