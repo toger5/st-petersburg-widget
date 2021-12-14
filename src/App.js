@@ -477,7 +477,7 @@ function PubActivationSelector(props){
     let pSelector = props.pubSelector;
     return <div className={"PubActivationSelector"}>
         <p>Select how often to use your pub:</p>
-    {Array.from(Array(pSelector.possibleActivations - 1).keys()).map(i => {
+    {Array.from(Array(pSelector.possibleActivations).keys()).map(i => {
         let count = i+1;
         return <button key={i} onClick={pSelector.onSelect.bind(null, count)}>{count*2+" Rubel -> "+count+" Points"}</button>
     })}
