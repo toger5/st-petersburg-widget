@@ -119,8 +119,8 @@ class App extends Component {
         }
         if(gameState.isPlayedToEnd){
             let summary = GameState.gameSummary(startState, gameState.turns)
-            let summaryPlayerTextList = summary.playerSummarys.map((p,i) =>
-            "<strong>"+(i+1)+". Place <a href=\"https://matrix.to/#/"+summary.playerSummarys[i].matrixId+"\">"+summary.playerSummarys[i].matrixId+"</a></strong>\n"+
+            let summaryPlayerTextList = summary.playerSummaries.map((p,i) =>
+            "<strong>"+(i+1)+". Place <a href=\"https://matrix.to/#/"+summary.playerSummaries[i].matrixId+"\">"+summary.playerSummaries[i].matrixId+"</a></strong>\n"+
             "<p>with <strong>"+p.points+"</strong> points:</p>\n"+
             "<ul>"+
             "<li><strong>Final settlement:</strong>\n"+
@@ -140,7 +140,7 @@ class App extends Component {
                 "format": "org.matrix.custom.html",
                 "formatted_body": 
                 "🕍 The Game is Over:<br>" +
-                "<a href=\"https://matrix.to/#/"+summary.playerSummarys[0].matrixId+"\">"+summary.playerSummarys[0].matrixId+"</a><strong>Absolutly dominated the competition!</strong> and won this game.<br>"+
+                "Congratulations to <a href=\"https://matrix.to/#/"+summary.playerSummaries[0].matrixId+"\">"+summary.playerSummaries[0].matrixId+"</a>, who <strong>won the game.</strong><br><br>"+
                 summaryPlayerTextList.join("") +
                 "<br><em>Sent from the St. Petersburg Widget</em>"
             }

@@ -199,9 +199,9 @@ export class GameState {
         return states;
     }
     static gameSummary(startState, turns){
-        let playerSummarys = []
+        let playerSummaries = []
         for(let p of startState.players){
-            playerSummarys.push({
+            playerSummaries.push({
                 points: 0,
                 money: 0,
                 pointsFromMoney: 0,
@@ -224,7 +224,7 @@ export class GameState {
             let prevGs;
             if(i > 1){prevGs = history[i-1];}
             if(prevGs){
-                for(const [pIndex, p] of playerSummarys.entries()){
+                for(const [pIndex, p] of playerSummaries.entries()){
                     if(prevGs.phase != gs.phase && !gs.isGameOver){
                         switch(prevGs.phase){
                             case CardCategory.Worker:
@@ -247,16 +247,16 @@ export class GameState {
                         p.countFinalHandCards = gs.players[pIndex].handCards.length;
                         p.pointsFinalHandCards = -5 * p.pointsFinalHandCards;
                         p.pointsFromMoney = Math.floor(gs.players[pIndex].money/10);
-                        p.points = gs.players[pIndex].points + p.pointsFromMoney + p.pointsFinalHandCards;
                         p.money = gs.players[pIndex].money;
                     }
+                    p.points = gs.players[pIndex].points + p.pointsFromMoney + p.pointsFinalHandCards;
                 }
             }
         }
 
         return {
             amountTurns: turns.length,
-            playerSummarys: playerSummarys.sort((a,b)=>b.points-a.points) // sorted so that the winner is the first player in the list
+            playerSummaries: playerSummaries.sort((a,b)=>b.points-a.points) // sorted so that the winner is the first player in the list
         };
     }
 }
