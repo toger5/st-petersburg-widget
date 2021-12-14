@@ -42,6 +42,7 @@ export class GameState {
     };
     turns = [];
     isGameOver = false;
+    isPlayedToEnd = false;
     sender = "";
     
     getBeginningPlayerIndexForPhase(phase) {
@@ -111,8 +112,19 @@ export class GameState {
                 }
 
                 if (newPhase) {
-                    turn.nextPhase = true;
-                    this.nextPhase();
+                    if(this.hasEmptyDeck() && (this.phase == CardCategory.Exchange)){
+                        // the game is over!
+                        for(let p of this.players){
+                            p.aristocratPoints()
+                        }
+                        this.isGameOver = true;
+                        this.isPlayedToEnd = true;
+                        // make the final point calculations for aristocrats!
+            
+                    }else{
+                        turn.nextPhase = true;
+                        this.nextPhase();
+                    }
                 } else {
                     this.nextPlayer();
                 }
@@ -149,26 +161,17 @@ export class GameState {
                 break;
             }
         }
-        if(this.isPlayedToEnd()){
-            this.isGameOver = true;
-            for(let p of this.players){
-                p.aristocratPoints()
-            }
-            // make the final point calculations for aristocrats!
-
-        }
         this.turns.push(turn);
     }
     isCancelled() {
-        return this.isGameOver && !this.isPlayedToEnd();
+        return this.isGameOver && !this.isPlayedToEnd;
     }
-    isPlayedToEnd(){
+    hasEmptyDeck(){
         let oneStackEmpty = false;
         for (let i = 0; i < 4; i++) {
-            oneStackEmpty = this.cards[i].length == 0
+            if(this.cards[i].length == 0) {oneStackEmpty = true};
         }
-        let phaseIsExchange = this.phase == CardCategory.Exchange;
-        return oneStackEmpty && phaseIsExchange;
+        return oneStackEmpty;
     }
 
     getSendObj(){
@@ -213,30 +216,31 @@ export class GameState {
                 countFinalAristocrats: 0,
             });
         }
-        const history = createGameStateHistory(startState, turns);
+        const history = GameState.createGameStateHistory(startState, turns);
         for(let i = 0; i < history.length;i++){
             let gs = history[i];
             let prevGs;
             if(i > 1){prevGs = history[i-1];}
             if(prevGs){
-                for(let pIndex, p of playerSummarys.entries()){
+                for(const [pIndex, p] of playerSummarys.entries()){
                     if(prevGs.phase != gs.phase && !gs.isGameOver){
                         switch(prevGs.phase){
                             case CardCategory.Worker:
-                                p.moneyWorker += prevGs.players[pIndex].money - gs.players[pIndex].money;
-                                p.pointsWorker += prevGs.players[pIndex].points - gs.players[pIndex].points;
+                                p.moneyWorker += gs.players[pIndex].money - prevGs.players[pIndex].money;
+                                p.pointsWorker += gs.players[pIndex].points - prevGs.players[pIndex].points;
                             break;
                             case CardCategory.Building:
-                                p.moneyBuildings += prevGs.players[pIndex].money - gs.players[pIndex].money;
-                                p.pointsBuildings += prevGs.players[pIndex].points - gs.players[pIndex].points;
+                                p.moneyBuildings += gs.players[pIndex].money - prevGs.players[pIndex].money;
+                                p.pointsBuildings += gs.players[pIndex].points - prevGs.players[pIndex].points;
+                            break;
                             case CardCategory.Aristocrat:
-                                p.moneyAristocrats += prevGs.players[pIndex].money - gs.players[pIndex].money;
-                                p.pointsAristocrats += prevGs.players[pIndex].points - gs.players[pIndex].points;
+                                p.moneyAristocrats += gs.players[pIndex].money - prevGs.players[pIndex].money;
+                                p.pointsAristocrats += gs.players[pIndex].points - prevGs.players[pIndex].points;
                             break;
                         }
                     }
                     if(gs.isGameOver){
-                        p.pointsFinalAristocrats = prevGs.players[pIndex].points - gs.players[pIndex].points;
+                        p.pointsFinalAristocrats = gs.players[pIndex].points - prevGs.players[pIndex].points;
                         p.pointsFromMoney = Math.floor(gs.players[pIndex].money/10);
                         p.points = gs.players[pIndex].points + p.pointsFromMoney;
                         p.countFinalAristocrats = gs.players[pIndex].aristocratsCount();
@@ -247,8 +251,8 @@ export class GameState {
         }
 
         return {
-            amountTurns: turn.length,
-            playerSummarys: playerSummarys.sort((a,b)=>b.points-a.points) // sorted so that first player is winner
+            amountTurns: turns.length,
+            playerSummarys: playerSummarys.sort((a,b)=>b.points-a.points) // sorted so that the winner is the first player in the list
         };
     }
 }
@@ -302,12 +306,13 @@ export class Player {
         this.disabledCards = [];
     }
     aristocratsCount(){
-        let aristocrats = this.handCards.filter((cardId)=>{
+        let aristocrats = this.field.filter((cardId)=>{
             let card = Cards.byId(cardId);
             return card.category == CardCategory.Aristocrat || 
                 (card.category == CardCategory.Exchange && card.upgradeCategory == CardCategory.Aristocrat);
         })
-        const aristocratSet = new Set(aristocrats);
+        let aristocratsByType = aristocrats.map(a=> Cards.byId(a).type);
+        const aristocratSet = new Set(aristocratsByType);
         return Array.from(aristocratSet).length;
     }
     aristocratPoints(){

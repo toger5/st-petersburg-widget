@@ -10,7 +10,7 @@ export function StartGamePage(props) {
         {(gameState.isGameOver) &&
             <div>
                 {gameState.isCancelled() && <>The game got cancelld. Start a new one!</>}
-                {(gameState.isPlayedToEnd() && gameState.isGameOver) &&
+                {(gameState.isPlayedToEnd) &&
                     <> The game is over, the winner is: <br />
                         {gameState?.players?.sort((a, b) => a.points - b.points).length > 0
                             ? gameState?.players?.sort((a, b) => a.points - b.points)[0].userId
