@@ -1,6 +1,8 @@
 # Saint Petersburg Widget
 This is a matrix widget that implements the board game "Saint Petersburg".
 
+<img height="500px" src="https://user-images.githubusercontent.com/16718859/146571173-ac75e0aa-77d2-4b06-a070-7f4fc368bd69.png">
+
 ### Thank you, Hans Im Glueck
 This was only made possible by the publisher "Hans Im Glueck" who provided me with a license that I can share the code including their art and host it as a static site so the widget can be made accessible in a matrix room by calling:
 `/addwidget https://vibrant-swanson-5be55c.netlify.app/#/?widgetId=$matrix_widget_id&userId=$matrix_user_id` \
