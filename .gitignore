@@ -2,3 +2,4 @@ node_modules/
 api.js
 yarn-error.log
 dist/main.js
+.vscode
