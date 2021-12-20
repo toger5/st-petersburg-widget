@@ -14,29 +14,31 @@ export function TurnDrawer(props){
     const prevState = props.prevState;
     let elem;
     let card;
-    let cardId = turn.cardId;
-    switch(turn.type){
+    let cardId = turn?.cardId;
+    switch(turn?.type){
         case TurnType.Pass:
-            elem = <div>⏩ <span style={{fontSize: "x-small"}}>Pass</span></div>;
+            let passLabel =turn?.nextPhase ?<span>⏩⏩ Started <b>Next Phase</b>.</span> : <span>⏩ Passed.</span>
+            elem = <div>{passLabel}</div>;
             break;
         case TurnType.BuyCard:
             card = Cards.byId(cardId);
             let player = prevState.getCurrentPlayer();
             let cardPrice = player.minPriceForCard(cardId, prevState);
             let exchangeCard = null;
-            elem = <div><CardPreview card={card}/>💰 <span style={{fontSize: "x-small"}}>Bought card for {cardPrice} rubel.<b></b></span></div>;
+            elem = <div>💰 <span>Bought card for <b>{cardPrice} rubel.</b></span><CardPreview card={card}/></div>;
             if(card.category == CardCategory.Exchange){
                 cardPrice = player.priceForExchangeCard(cardId, prevState, turn.exchangeCardId);
                 exchangeCard = Cards.byId(turn.exchangeCardId);
-                elem = <div><CardPreview card={exchangeCard}/>💰 <span className="exchangeIcon">↬</span><CardPreview card={card}/> <span style={{fontSize: "x-small"}}>Exchanged card for {cardPrice} rubel.<b></b></span></div>;
+                elem = <div>💰 <span className="exchangeIcon">↬</span><CardPreview card={card}/> <span style={{fontSize: "x-small"}}>Exchanged card for {cardPrice} rubel.<b></b></span><CardPreview card={exchangeCard}/></div>;
             }
         break;
         case TurnType.TakeCard:
             card = Cards.byId(cardId);
-            elem = <div><CardPreview card={card}/>🤙 <span style={{fontSize: "x-small"}}>Took card on Hand.<b></b></span></div>;
+            elem = <div>🤙 <span>Took card on <b>Hand</b>.</span><CardPreview card={card}/></div>;
+            break;
         case TurnType.ActivateCard:
             card = Cards.byId(cardId);
-            elem = <div><CardPreview card={card}/>🎆 <span style={{fontSize: "x-small"}}>Activated card.<b></b></span></div>;
+            elem = <div>🎆<span><b>Activated</b> card.</span><CardPreview card={card}/></div>;
         break;
     }
     return <div className="turnDrawer">{elem}</div>;

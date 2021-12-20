@@ -5,13 +5,14 @@ import { TurnType } from "./gameState";
 import { TurnDrawer } from "./turnDrawer";
 
 export function Card(props) {
-    let curP = props.currentPlayer;
-    let cardOwnerPlayer = props.cardOwnerPlayer;
-    let gs = props.gs;
-    let cardId = props.cardId;
-    let cardObj = Cards.byId(cardId);
-    let skipFieldChecks = props.skipFieldChecks ?? false;
-    let cardGotActivatedInThisRound = cardOwnerPlayer?.disabledCards.includes(cardId);
+    const curP = props.currentPlayer;
+    const cardOwnerPlayer = props.cardOwnerPlayer;
+    const gs = props.gs;
+    const cardId = props.cardId;
+    const isHighlighted = props.isHighlighted;
+    const cardObj = Cards.byId(cardId);
+    const skipFieldChecks = props.skipFieldChecks ?? false;
+    const cardGotActivatedInThisRound = cardOwnerPlayer?.disabledCards.includes(cardId);
     
     let onCardTake = curP?.canTakeCard(cardId, gs, skipFieldChecks)
     ? props.onCardTake?.bind(null, cardId) : null;
@@ -28,9 +29,9 @@ export function Card(props) {
         color: "white";
         style.backgroundImage = `url(${cardObj.image})`;
     }
-    let cardSelector = props.cardSelector;
-    let selectable = cardSelector?.optionCardIds.includes(cardId);
-    return <div className={"card" + (selectable ? " selectable" : "")} style={style}>
+    const cardSelector = props.cardSelector;
+    const selectable = cardSelector?.optionCardIds.includes(cardId);
+    return <div className={"card" + (selectable ? " selectable" : "") + (isHighlighted ? " highlighted" : "")} style={style}>
         {(cardObj && !cardSelector) &&
             <>
                 {onCardBuy && <button onClick={onCardBuy}>Buy</button>}
@@ -43,7 +44,7 @@ export function Card(props) {
         {selectable &&
             <button onClick={cardSelector.onSelect.bind(null, cardId)}>Select</button>
         }
-        {props.showCardId && cardId}
+        {props.showCardIds && cardId}
 
     </div>
 }
@@ -56,7 +57,7 @@ function CardFieldRow(props) {
     let onCardTake = props.onCardTake;
     let onCardActivate = props.onCardActivate;
     let cardSelector = props.cardSelector;
-
+    let highlightedCardId = props.highlightedCardId
     return <div className={"CardFieldRow" + " " + (props.className || "")}>
         {cardIds.map(
             (cardId, index) => {
@@ -70,7 +71,8 @@ function CardFieldRow(props) {
                     key={index}
                     cardSelector={cardSelector}
                     cardOwnerPlayer={props.cardOwnerPlayer}
-                    showCardId={props.showCardId}
+                    showCardIds={props.showCardIds}
+                    isHighlighted={highlightedCardId == cardId}
                 />
             }
         )}
@@ -104,6 +106,7 @@ function PlayerBox(props) {
     let isCurrent = curP.matrixId == p.matrixId;
     let cardSelector = props.cardSelector;
     let expanded = props.expanded;
+    let gameStateHistory = props.gameStateHistory;
 
     let handCards = createCardIdArray(p.handCards, p.handSize, false);
     let yourPlayer = p.matrixId == props.thisPlayerMatrixId;
@@ -123,7 +126,9 @@ function PlayerBox(props) {
             </div>
         </div>
     </div >
-    let playerField = <CardFieldRow
+    const lastActionForPlayer = p.lastTurn(gameStateHistory) ?? {turn: null, prevState: null};
+    const highlightedCardId = lastActionForPlayer?.turn?.cardId;
+    const playerField = <CardFieldRow
         className={"playerField"}
         currentPlayer={curP}
         gs={gs}
@@ -131,14 +136,24 @@ function PlayerBox(props) {
         onCardActivate={props.onCardActivate}
         cardSelector={cardSelector}
         cardOwnerPlayer={p}
-        showCardId={props.showCardId}
+        showCardIds={props.showCardIds}
+        highlightedCardId={highlightedCardId}
     />
     return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")+(expanded?" expanded":"")}>
-        <p>{idLabel}</p>
+        <p>{idLabel} <TurnDrawer turn={lastActionForPlayer.turn} prevState={lastActionForPlayer.prevState}></TurnDrawer></p>
         <div style={{ display: "flex", flexDirection: "row" }}>
             {playerInfo}
 
-            <CardFieldRow className={"hand"} currentPlayer={curP} gs={gs} cardIds={handCards} onCardBuy={props.onCardBuy} cardSelector={cardSelector} showCardId={props.showCardId}/>
+            <CardFieldRow 
+            className={"hand"} 
+            currentPlayer={curP} 
+            gs={gs} 
+            cardIds={handCards} 
+            onCardBuy={props.onCardBuy} 
+            cardSelector={cardSelector} 
+            showCardIds={props.showCardIds} h
+            highlightedCardId={highlightedCardId}
+            />
             {!expanded && playerField}
         </div>
         {expanded && playerField}
@@ -148,8 +163,7 @@ function PlayerBox(props) {
 function ControlElement(props) {
     return <div style={{ display: "flex", flexDirection: "row" }}>
         <button disabled={!props.onPassClick} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
-        {!props.showGameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>History View</button>}
-        {!!props.showGameStateHistory && <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>Gameplay View</button>}
+        <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>{ props.showGameStateHistory ? "Gameplay View" : "History View" }</button>
         <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
     </div>;
 }
@@ -237,10 +251,9 @@ class GameField extends Component {
 
         return (
             <>
-                {/* <TurnDrawer turn={gs.turns[gs.turns.length - 1]} prevState={this.props.history[-1]}></TurnDrawer> */}
                 <div className={'field' + (yourTurn ? ' yourTurn' : '') + " "+(CardCategory.label(gs.phase))} >
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardId={this.props.showCardId}/>
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardId={this.props.showCardId}/>
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardIds={this.props.showCardIds}/>
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardIds={this.props.showCardIds}/>
                 </div>
                 <ControlElement
                         onPassClick={onPass}
@@ -259,7 +272,8 @@ class GameField extends Component {
                             onCardBuy={onCardBuy?.bind(this)}
                             onCardActivate={onCardActivate?.bind(this)}
                             cardSelector={cardSelector}
-                            showCardId={this.props.showCardId}
+                            showCardIds={this.props.showCardIds}
+                            gameStateHistory={this.props.gameStateHistory}
                         />
                     }
                     )}

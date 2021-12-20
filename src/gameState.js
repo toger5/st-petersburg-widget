@@ -44,7 +44,7 @@ export class GameState {
     isGameOver = false;
     isPlayedToEnd = false;
     sender = "";
-    
+
     getBeginningPlayerIndexForPhase(phase) {
         return this.players.indexOf(this.players.find(p => (p.startPhases.includes(phase))));
     }
@@ -112,16 +112,16 @@ export class GameState {
                 }
 
                 if (newPhase) {
-                    if(this.hasEmptyDeck() && (this.phase == CardCategory.Exchange)){
+                    if (this.hasEmptyDeck() && (this.phase == CardCategory.Exchange)) {
                         // the game is over!
-                        for(let p of this.players){
+                        for (let p of this.players) {
                             p.aristocratPoints()
                         }
                         this.isGameOver = true;
                         this.isPlayedToEnd = true;
                         // make the final point calculations for aristocrats!
-            
-                    }else{
+
+                    } else {
                         turn.nextPhase = true;
                         this.nextPhase();
                     }
@@ -166,15 +166,15 @@ export class GameState {
     isCancelled() {
         return this.isGameOver && !this.isPlayedToEnd;
     }
-    hasEmptyDeck(){
+    hasEmptyDeck() {
         let oneStackEmpty = false;
         for (let i = 0; i < 4; i++) {
-            if(this.cards[i].length == 0) {oneStackEmpty = true};
+            if (this.cards[i].length == 0) { oneStackEmpty = true };
         }
         return oneStackEmpty;
     }
 
-    getSendObj(){
+    getSendObj() {
         let sendObj = App.cloneGameState(this);
         delete sendObj.seed;
         delete sendObj.sender;
@@ -182,15 +182,15 @@ export class GameState {
         return sendObj;
     }
 
-    getHash(){
+    getHash() {
         return stringHash(JSON.stringify(this.getSendObj()));
     }
 
-    static createGameStateHistory(startState, turns){
+    static createGameStateHistory(startState, turns) {
         let gs = App.cloneGameState(startState);
         gs.seed = startState.getHash();
         let states = [App.cloneGameState(gs)]
-        for(let t of turns){
+        for (let t of turns) {
             let prevStateHash = gs.getHash();
             gs.nextStateAfterTurn(t);
             states.push(App.cloneGameState(gs));
@@ -198,9 +198,9 @@ export class GameState {
         }
         return states;
     }
-    static gameSummary(startState, turns){
+    static gameSummary(startState, turns) {
         let playerSummaries = []
-        for(let p of startState.players){
+        for (let p of startState.players) {
             playerSummaries.push({
                 points: 0,
                 money: 0,
@@ -219,34 +219,34 @@ export class GameState {
             });
         }
         const history = GameState.createGameStateHistory(startState, turns);
-        for(let i = 0; i < history.length;i++){
+        for (let i = 0; i < history.length; i++) {
             let gs = history[i];
             let prevGs;
-            if(i > 1){prevGs = history[i-1];}
-            if(prevGs){
-                for(const [pIndex, p] of playerSummaries.entries()){
-                    if(prevGs.phase != gs.phase && !gs.isGameOver){
-                        switch(prevGs.phase){
+            if (i > 1) { prevGs = history[i - 1]; }
+            if (prevGs) {
+                for (const [pIndex, p] of playerSummaries.entries()) {
+                    if (prevGs.phase != gs.phase && !gs.isGameOver) {
+                        switch (prevGs.phase) {
                             case CardCategory.Worker:
                                 p.moneyWorker += gs.players[pIndex].money - prevGs.players[pIndex].money;
                                 p.pointsWorker += gs.players[pIndex].points - prevGs.players[pIndex].points;
-                            break;
+                                break;
                             case CardCategory.Building:
                                 p.moneyBuildings += gs.players[pIndex].money - prevGs.players[pIndex].money;
                                 p.pointsBuildings += gs.players[pIndex].points - prevGs.players[pIndex].points;
-                            break;
+                                break;
                             case CardCategory.Aristocrat:
                                 p.moneyAristocrats += gs.players[pIndex].money - prevGs.players[pIndex].money;
                                 p.pointsAristocrats += gs.players[pIndex].points - prevGs.players[pIndex].points;
-                            break;
+                                break;
                         }
                     }
-                    if(gs.isGameOver){
+                    if (gs.isGameOver) {
                         p.pointsFinalAristocrats = gs.players[pIndex].points - prevGs.players[pIndex].points;
                         p.countFinalAristocrats = gs.players[pIndex].aristocratsCount();
                         p.countFinalHandCards = gs.players[pIndex].handCards.length;
                         p.pointsFinalHandCards = -5 * p.pointsFinalHandCards;
-                        p.pointsFromMoney = Math.floor(gs.players[pIndex].money/10);
+                        p.pointsFromMoney = Math.floor(gs.players[pIndex].money / 10);
                         p.money = gs.players[pIndex].money;
                     }
                     p.points = gs.players[pIndex].points + p.pointsFromMoney + p.pointsFinalHandCards;
@@ -256,7 +256,7 @@ export class GameState {
 
         return {
             amountTurns: turns.length,
-            playerSummaries: playerSummaries.sort((a,b)=>b.points-a.points) // sorted so that the winner is the first player in the list
+            playerSummaries: playerSummaries.sort((a, b) => b.points - a.points) // sorted so that the winner is the first player in the list
         };
     }
 }
@@ -284,16 +284,16 @@ export class Player {
     field = [];
     startPhases = [];
     disabledCards = []
-    getSortedField(){
+    getSortedField() {
         return [...this.field].sort((cIdA, cIdB) => {
             const [cA, cB] = [Cards.byId(cIdA), Cards.byId(cIdB)]
-            const categoryA = cA.category == CardCategory.Exchange ? cA.upgradeCategory :cA.category;
-            const categoryB = cB.category == CardCategory.Exchange ? cB.upgradeCategory :cB.category;
+            const categoryA = cA.category == CardCategory.Exchange ? cA.upgradeCategory : cA.category;
+            const categoryB = cB.category == CardCategory.Exchange ? cB.upgradeCategory : cB.category;
             return ((categoryA * 1000) + cIdA) - ((categoryB * 1000) + cIdB)
         });
     }
     phaseEvalutation(gameState) {
-        if(gameState.phase == CardCategory.Exchange) return;
+        if (gameState.phase == CardCategory.Exchange) return;
         let cardsToEvaluate = this.field
             .map((cardId) => { return Cards.byId(cardId) })
             .filter((card) => {
@@ -309,26 +309,26 @@ export class Player {
         this.points += p;
         this.disabledCards = [];
     }
-    aristocratsCount(){
-        let aristocrats = this.field.filter((cardId)=>{
+    aristocratsCount() {
+        let aristocrats = this.field.filter((cardId) => {
             let card = Cards.byId(cardId);
-            return card.category == CardCategory.Aristocrat || 
+            return card.category == CardCategory.Aristocrat ||
                 (card.category == CardCategory.Exchange && card.upgradeCategory == CardCategory.Aristocrat);
         })
-        let aristocratsByType = aristocrats.map(a=> Cards.byId(a).type);
+        let aristocratsByType = aristocrats.map(a => Cards.byId(a).type);
         const aristocratSet = new Set(aristocratsByType);
         return Array.from(aristocratSet).length;
     }
-    aristocratPoints(){
+    aristocratPoints() {
         let ariCount = this.aristocratsCount();
-        this.points += Math.min((ariCount + 1) * (ariCount/2), 55)
+        this.points += Math.min((ariCount + 1) * (ariCount / 2), 55)
     }
     canTakeCard(cardId, gs, skipFieldCheck) {
         if (!Cards.byId(cardId)) return false;
         // check if card  if on one of the field
         let cardsPossibleToTake = gs.fieldBottom.concat(gs.fieldTop);
         let cardIsOnAccessibleField = cardsPossibleToTake.includes(cardId);
-        
+
         // check if there is enough space in the player hand
         let handHasSpace = this.handCards.length < this.handSize;
 
@@ -400,30 +400,40 @@ export class Player {
         discount += gs.fieldBottom.includes(cardId) ? 1 : 0;
         return discount
     }
-    
+
     priceForExchangeCard(cardId, gs, exchangeId) {
         const exchangeCardWorth = Cards.byId(exchangeId).exchangePrice ?? Cards.byId(exchangeId).price
         let discountTotal = exchangeCardWorth + this.discountsForCard(cardId, gs);
         let price = Math.max(Cards.byId(cardId).price - discountTotal, 1)
         return price;
     }
-    
+
     minPriceForCard(cardId, gs) {
         let discount = this.discountsForCard(cardId, gs);
         let buyCard = Cards.byId(cardId);
         let price = Math.max(buyCard.price - discount, 1)
         if (buyCard.category == CardCategory.Exchange) {
             let exchangeOptions = this.getPossibleUpgradesForCard(cardId);
-            let cheapestExchangeCardId = exchangeOptions.sort((a, b) =>{
-                return this.priceForExchangeCard(cardId,gs,a) - this.priceForExchangeCard(cardId,gs,b)
-            } )[0]
-            if(cheapestExchangeCardId){
+            let cheapestExchangeCardId = exchangeOptions.sort((a, b) => {
+                return this.priceForExchangeCard(cardId, gs, a) - this.priceForExchangeCard(cardId, gs, b)
+            })[0]
+            if (cheapestExchangeCardId) {
                 price = this.priceForExchangeCard(cardId, gs, cheapestExchangeCardId);
             }
         }
         return price;
     }
-    
+    lastTurn(history) {
+        for (let i = history.length - 2; i >= 0; i--) {
+            if (history[i].getCurrentPlayer().matrixId == this.matrixId) {
+                return {
+                    turn: history[i + 1].turns[history[i + 1].turns.length - 1],
+                    prevState: history[i],
+                }
+            }
+        }
+        return null;
+    }
 }
 
 export function getGameState(turns, initialGameState) {

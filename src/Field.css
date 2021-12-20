@@ -179,8 +179,11 @@
     border-radius: 3px;
 }
 
-.card.selectable{
-    border-width: 3px;
-    border-color: rgb(165, 241, 77);
-    border-style: solid;
+.card.highlighted{
+    box-shadow: 0 0 5px 2px #56cf2e;
 }
+
+.card.selectable{
+    box-shadow: 0 0 5px 2px #ffbd44;
+}
+

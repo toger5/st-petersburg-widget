@@ -292,15 +292,15 @@ class App extends Component {
             // here we dont care about the seed
         }
 
-        this.startState = startState,
         // HISTORY:
         let history;
         if(!this.state.gameStateHistory){
-            history = GameState.createGameStateHistory(this.startState, newGs.turns);
+            history = GameState.createGameStateHistory(startState, newGs.turns);
         } else {
             history = this.state.gameStateHistory.concat(App.cloneGameState(newGs));
         }
-
+        
+        this.startState = startState;
         this.setState({
             lockUI: false,
             gameState: newGs,//Object.assign(oldGs, newGsContent),
@@ -429,7 +429,7 @@ class App extends Component {
                             gameStateHistory={this.state.gameStateHistory}
                             showGameStateHistory={false}
                             onHistoryToggle={this.toggleHistoryView.bind(this, this.state.showGameStateHistory)}
-                            showCardId={this.state.SHOW_CARD_ID}
+                            showCardIds={this.state.SHOW_CARD_ID}
                         />
                     }
                     {this.state.showGameStateHistory &&
@@ -444,7 +444,7 @@ class App extends Component {
                                 showGameStateHistory={true}
                                 gameStateHistory={this.state.gameStateHistory}
                                 onHistoryToggle={this.toggleHistoryView.bind(this, this.state.showGameStateHistory)}
-                                showCardId={this.state.SHOW_CARD_ID}
+                                showCardIds={this.state.SHOW_CARD_ID}
                             />
                         </>
                     }
