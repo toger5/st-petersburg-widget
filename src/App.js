@@ -442,7 +442,7 @@ class App extends Component {
                                 gameState={gs}
                                 userId={this.userId}
                                 showGameStateHistory={true}
-                                gameStateHistory={this.state.gameStateHistory}
+                                gameStateHistory={this.state.gameStateHistory.slice(0, this.state.gameStateHistoryIndex + 1)}
                                 onHistoryToggle={this.toggleHistoryView.bind(this, this.state.showGameStateHistory)}
                                 showCardIds={this.state.SHOW_CARD_ID}
                             />
