@@ -1,11 +1,15 @@
 const path = require('path');
 const pconf = require('./package.json')
 const webpack = require('webpack');
+const VERSION_OUTPUTS = {
+    vCurrent: "dist",
+    v0_1_8: 'dist/0.1.8'
+}
 module.exports = {
     entry: './src/main.js',
     output: {
         filename: 'main.js',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, VERSION_OUTPUTS.vCurrent),
     },
     plugins: [
         new webpack.DefinePlugin({
