@@ -8,10 +8,12 @@ export function shuffle(array, seed) {
     shuffleArr.push(arrayCopy.splice(index, 1)[0]);
   }
 
-  //sort cheat to make observatory easier to get.
+  //sort cheat to make specific cards easier to get.
   if (false) {
     let foundOne = false;
-    for (const obsId of [28 + 29, 28 + 30]) {
+    const obs_IDs = [28 + 29, 28 + 30]
+    const marinsky_IDs = [99]
+    for (const obsId of marinsky_IDs) {
       if (shuffleArr.includes(obsId) && !foundOne) {
         let indexOfObs = shuffleArr.indexOf(obsId);
         if (indexOfObs != -1) {
@@ -23,7 +25,6 @@ export function shuffle(array, seed) {
     }
   }
   return shuffleArr;
-  // return array.sort(() => (seed ? alea(seed) : Math.random()) - 0.5);
 }
 export function splitIntoChunks(array, chunkSizes) {
   let ret = [];

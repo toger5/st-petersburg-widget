@@ -55,132 +55,132 @@ export const CardType = {
 }
 
 export const INDEX_WORKER = [
-    CardType.Lumberjack,
-    CardType.Lumberjack,
-    CardType.Lumberjack,
-    CardType.Lumberjack,
-    CardType.Lumberjack,
-    CardType.Lumberjack,
-    CardType.Goldminer,
-    CardType.Goldminer,
-    CardType.Goldminer,
-    CardType.Goldminer,
-    CardType.Goldminer,
-    CardType.Goldminer,
-    CardType.Sheperd,
-    CardType.Sheperd,
-    CardType.Sheperd,
-    CardType.Sheperd,
-    CardType.Sheperd,
-    CardType.Sheperd,
-    CardType.FurTrapper,
-    CardType.FurTrapper,
-    CardType.FurTrapper,
-    CardType.FurTrapper,
-    CardType.FurTrapper,
-    CardType.FurTrapper,
-    CardType.ShipBuilder,
-    CardType.ShipBuilder,
-    CardType.ShipBuilder,
-    CardType.ShipBuilder,
-    CardType.ShipBuilder,
-    CardType.ShipBuilder,
-    CardType.CzarAndCarpenter,
+    CardType.Lumberjack,  // 0 
+    CardType.Lumberjack, // 1 
+    CardType.Lumberjack, // 2 
+    CardType.Lumberjack, // 3 
+    CardType.Lumberjack, // 4 
+    CardType.Lumberjack, // 5 
+    CardType.Goldminer, // 6 
+    CardType.Goldminer, // 7 
+    CardType.Goldminer, // 8 
+    CardType.Goldminer, // 9 
+    CardType.Goldminer, // 10 
+    CardType.Goldminer, // 11 
+    CardType.Sheperd, // 12 
+    CardType.Sheperd, // 13 
+    CardType.Sheperd, // 14 
+    CardType.Sheperd, // 15 
+    CardType.Sheperd, // 16 
+    CardType.Sheperd, // 17 
+    CardType.FurTrapper, // 18 
+    CardType.FurTrapper, // 19 
+    CardType.FurTrapper, // 20 
+    CardType.FurTrapper, // 21 
+    CardType.FurTrapper, // 22 
+    CardType.FurTrapper, // 23 
+    CardType.ShipBuilder, // 24 
+    CardType.ShipBuilder, // 25 
+    CardType.ShipBuilder, // 26 
+    CardType.ShipBuilder, // 27 
+    CardType.ShipBuilder, // 28 
+    CardType.ShipBuilder, // 29 
+    CardType.CzarAndCarpenter, // 30 
 ]
 
 export const INDEX_BUILDINGS = [
-    CardType.Market,
-    CardType.Market,
-    CardType.Market,
-    CardType.Market,
-    CardType.Market,
-    CardType.CustomsHouse,
-    CardType.CustomsHouse,
-    CardType.CustomsHouse,
-    CardType.CustomsHouse,
-    CardType.CustomsHouse,
-    CardType.Firehouse,
-    CardType.Firehouse,
-    CardType.Firehouse,
-    CardType.Hospital,
-    CardType.Hospital,
-    CardType.Hospital,
-    CardType.Library,
-    CardType.Library,
-    CardType.Library,
-    CardType.Theater,
-    CardType.Theater,
-    CardType.Academy,
-    CardType.PotemkinViallage,
-    CardType.Pub,
-    CardType.Pub,
-    CardType.WareHouse,
-    CardType.Observatory,
-    CardType.Observatory,
+    CardType.Market, // 31 
+    CardType.Market, // 32 
+    CardType.Market, // 33 
+    CardType.Market, // 34 
+    CardType.Market, // 35 
+    CardType.CustomsHouse, // 36 
+    CardType.CustomsHouse, // 37 
+    CardType.CustomsHouse, // 38 
+    CardType.CustomsHouse, // 39 
+    CardType.CustomsHouse, // 40 
+    CardType.Firehouse, // 41 
+    CardType.Firehouse, // 42 
+    CardType.Firehouse, // 43 
+    CardType.Hospital, // 44 
+    CardType.Hospital, // 45 
+    CardType.Hospital, // 46 
+    CardType.Library, // 47 
+    CardType.Library, // 48 
+    CardType.Library, // 49 
+    CardType.Theater, // 50 
+    CardType.Theater, // 51 
+    CardType.Academy, // 52 
+    CardType.PotemkinViallage, // 53 
+    CardType.Pub, // 54 
+    CardType.Pub, // 55 
+    CardType.WareHouse, // 56 
+    CardType.Observatory, // 57 
+    CardType.Observatory, // 58 
 ]
 
 export const INDEX_ARISTOCRATS = [
-    CardType.Author,
-    CardType.Author,
-    CardType.Author,
-    CardType.Author,
-    CardType.Author,
-    CardType.Author,
-    CardType.Administrator,
-    CardType.Administrator,
-    CardType.Administrator,
-    CardType.Administrator,
-    CardType.Administrator,
-    CardType.WarehouseManager,
-    CardType.WarehouseManager,
-    CardType.WarehouseManager,
-    CardType.WarehouseManager,
-    CardType.WarehouseManager,
-    CardType.Secratary,
-    CardType.Secratary,
-    CardType.Secratary,
-    CardType.Secratary,
-    CardType.Controller,
-    CardType.Controller,
-    CardType.Controller,
-    CardType.Judge,
-    CardType.Judge,
-    CardType.MistressOfCeremonies,
-    CardType.MistressOfCeremonies,
+    CardType.Author, // 59 
+    CardType.Author, // 60 
+    CardType.Author, // 61 
+    CardType.Author, // 62 
+    CardType.Author, // 63 
+    CardType.Author, // 64 
+    CardType.Administrator, // 65 
+    CardType.Administrator, // 66 
+    CardType.Administrator, // 67 
+    CardType.Administrator, // 68 
+    CardType.Administrator, // 69 
+    CardType.WarehouseManager, // 70 
+    CardType.WarehouseManager, // 71 
+    CardType.WarehouseManager, // 72 
+    CardType.WarehouseManager, // 73 
+    CardType.WarehouseManager, // 74 
+    CardType.Secratary, // 75 
+    CardType.Secratary, // 76 
+    CardType.Secratary, // 77 
+    CardType.Secratary, // 78 
+    CardType.Controller, // 79 
+    CardType.Controller, // 80 
+    CardType.Controller, // 81 
+    CardType.Judge, // 82 
+    CardType.Judge, // 83 
+    CardType.MistressOfCeremonies, // 84 
+    CardType.MistressOfCeremonies, // 85 
 ]
 
 
 export const INDEX_EXCHANGE = [
-    CardType.CarpenterWorkshop,
-    CardType.GoldSmelter,
-    CardType.WeavingMill,
-    CardType.WeavingMill,
-    CardType.FurShop,
-    CardType.FurShop,
-    CardType.FurShop,
-    CardType.Wharf,
-    CardType.Wharf,
-    CardType.Wharf,
-    CardType.Bank,
-    CardType.Peterhof,
-    CardType.StIsaacsCathedral,
-    CardType.MarinksyTheater,
-    CardType.ChurchOfTheResurrection,
-    CardType.Harbor,
-    CardType.CathedralOfTheGreatPalace,
-    CardType.SmolnyCathedral,
-    CardType.Hermitage,
-    CardType.WinterPalace,
-    CardType.Abbot,
-    CardType.WeaponMaster,
-    CardType.ChamberMaid,
-    CardType.Builder,
-    CardType.Senator,
-    CardType.Patriarch,
-    CardType.Taxman,
-    CardType.Admiral,
-    CardType.MinisterOfForeignAffairs,
-    CardType.Czarin,
+    CardType.CarpenterWorkshop, // 86 
+    CardType.GoldSmelter, // 87 
+    CardType.WeavingMill, // 88 
+    CardType.WeavingMill, // 89 
+    CardType.FurShop, // 90 
+    CardType.FurShop, // 91 
+    CardType.FurShop, // 92 
+    CardType.Wharf, // 93 
+    CardType.Wharf, // 94 
+    CardType.Wharf, // 95 
+    CardType.Bank, // 96 
+    CardType.Peterhof, // 97 
+    CardType.StIsaacsCathedral, // 98 
+    CardType.MarinksyTheater, // 99 
+    CardType.ChurchOfTheResurrection, // 100 
+    CardType.Harbor, // 101 
+    CardType.CathedralOfTheGreatPalace, // 102 
+    CardType.SmolnyCathedral, // 103 
+    CardType.Hermitage, // 104 
+    CardType.WinterPalace, // 105 
+    CardType.Abbot, // 106 
+    CardType.WeaponMaster, // 107 
+    CardType.ChamberMaid, // 108 
+    CardType.Builder, // 109 
+    CardType.Senator, // 110 
+    CardType.Patriarch, // 111 
+    CardType.Taxman, // 112 
+    CardType.Admiral, // 113 
+    CardType.MinisterOfForeignAffairs, // 114 
+    CardType.Czarin, // 115 
 ]
 
 // cardId: CardType
