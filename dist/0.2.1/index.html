@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>St. Petersburg</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+  <script src="main.js"></script>
+  <div id="root">
+    <div id="welcomeBox">
+      <h2>Welcome to the St. Petersburg-Widget</h2><br>
+      You need to be authenticated to play.<br>
+      This is simple, the authentication works by joining this room:
+      <p id="roomLinkP" style="text-align: center;"></p>
+      <p style="font-size: x-small;"(serach for the roomId (shown above) in the public room directory)</p>
+      The Widget will check if you have joined this room and you can play. This serves two purposes:
+      <ul>
+        <li>First, I can estimate how many
+          people use this widget. If this exceeds the realm of a tech demo and is a competitor to official platforms
+          I can inform the publisher and a solution can be found.</li>
+        <li>The second advantage is, that the authentication-room can also be used
+          to quickly ask for help or serach for ppl to play with!</li>
+      </ul>
+      <div style="display: flex;justify-content: center;margin: 0 20%;">
+        <button style="flex-grow: 1;" id="tryAuthenticationButton">I joined the room, try again!</button>
+      </div>
+      <div style="font-size: x-small;">
+      <b>Trouble shooting guide</b>
+      In case things dont work there are multiple things to check.
+      <ul>
+        <li>Have you granted the widget all the required permissions? This is necassary to read the 
+          auth rooms state and check if you joined that room.
+        </li>
+        <li>
+          On Android the widget api to communicate with the client/ask read and sent room events is not yet supported.
+        </li>
+        <li>
+          When adding this widget to a room the "change room settings permission" must be allowed for all participating memebers, so that they can update the room stat, which is 
+          required to make a turn in the game.<br>
+          The easiest solution for this is to set the group for <b>change settings</b> to <b>Default</b> : Room settings -> Permission and roles -> change settings
+        </li>
+      </ul>
+    </div>
+    </div>
+  </div>
+</body>
+
+</html>
