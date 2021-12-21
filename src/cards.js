@@ -2,6 +2,7 @@ import { CARDS, CardType } from "./cardIndex";
 import { ActionType } from "./App";
 import * as helper from './helper';
 import { Card } from "./gameField";
+import GameField from "./gameField";
 
 export const CardCategory = {
     Worker:0,
@@ -203,8 +204,8 @@ cardsByType.set(CardType.Observatory, {
             case ActionType.Buy:
                 let price = curP.minPriceForCard(cardId, gs);
                 if (turn.payload.exchangeCardId != null) {
-                    // window.app
                     price = curP.priceForExchangeCard(cardId, gs, turn.payload.exchangeCardId);
+                    gs.removeCardFromGame(turn.payload.exchangeCardId);
                 }
                 curP.field.push(cardId);
                 curP.money -= price;
@@ -225,7 +226,7 @@ cardsByType.set(CardType.Observatory, {
                         (actionType) => {
                             if(actionType == ActionType.Buy && Cards.byId(randomCard).category == CardCategory.Exchange){
                                 // now we still need to check for which card needs to be updated:
-                                GameField.letUserSelectExchangeCradId(randomCard, gs.getCurrentPlayer(), gs).then( (selectedCard)=>{
+                                GameField.letUserSelectExchangeCradId(randomCard, gs.getCurrentPlayer(), gs, true).then( (selectedCard)=>{
                                     resolve({chosenDeck: selectedDeck, actionType: actionType, exchangeCardId: selectedCard})
                                 } )
                             }else{
@@ -373,8 +374,8 @@ cardsByType.set(CardType.Peterhof, {
 	type: CardType.Peterhof,
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_peterhof_EN.jpg",
     price:14,
-    points:4,
-    money:2,
+    points:2,
+    money:4,
     category: CardCategory.Exchange,
     upgradeCategory: CardCategory.Building,
 });

@@ -49,7 +49,7 @@
 }
 .playerBox {
     margin: 3px;
-    padding: 5px;
+    padding: 3px;
     border-width: 3px;
     border-radius: 8px;
     border-color: #f2f5f8;
@@ -187,3 +187,15 @@
     box-shadow: 0 0 5px 2px #ffbd44;
 }
 
+.avatar{
+    width: 30px;
+    height: 30px;
+    margin: 0 4px 0 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50%;
+    background-color: rgb(156, 191, 214);
+    display: inline-block;
+    vertical-align: middle;
+}

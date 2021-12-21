@@ -13,19 +13,22 @@
     color: rgb(184, 156, 106);
 }
 .turnDrawer{
-    /* margin: 0 5px; */
+    margin: 0 8px;
     display: inline;
     border-radius: 8px;
     /* border: solid 2px grey; */
 }
+
 .turnDrawer div{
     height: 25px;
     display: inline-block;
 }
+
 .turnDrawer .cardPreview{
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
 }
+
 .turnDrawer span {
     font-size: small;
     color: gray;

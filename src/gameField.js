@@ -3,6 +3,8 @@ import { CardCategory, Cards } from "./cards";
 import "./Field.css";
 import { TurnType } from "./gameState";
 import { TurnDrawer } from "./turnDrawer";
+import { StPetersburgContext } from "./context";
+import {rotatedArrayForPlayer} from "./helper"
 
 export function Card(props) {
     const curP = props.currentPlayer;
@@ -13,18 +15,18 @@ export function Card(props) {
     const cardObj = Cards.byId(cardId);
     const skipFieldChecks = props.skipFieldChecks ?? false;
     const cardGotActivatedInThisRound = cardOwnerPlayer?.disabledCards.includes(cardId);
-    
+
     let onCardTake = curP?.canTakeCard(cardId, gs, skipFieldChecks)
-    ? props.onCardTake?.bind(null, cardId) : null;
+        ? props.onCardTake?.bind(null, cardId) : null;
 
     let onCardBuy = curP?.canBuyCard(cardId, gs, undefined, skipFieldChecks)
         ? props.onCardBuy?.bind(null, cardId) : null;
-    
+
     let onCardActivate = curP?.canActivateCard(cardId, gs)
         ? props.onCardActivate?.bind(null, cardId) : null;
 
     let onCardDiscard = props.onCardDiscard?.bind(null, cardId);
-    let style = {color: "white"};
+    let style = { color: "white" };
     if (cardObj) {
         color: "white";
         style.backgroundImage = `url(${cardObj.image})`;
@@ -98,73 +100,80 @@ function StartPhaseIndicator(props) {
     }
     return <div className={classes[props.phase]}></div>;
 }
+class PlayerBox extends React.Component {
+    render(){
+        let p = this.props.player;
+        let curP = this.props.currentPlayer;
+        let gs = this.props.gs;
+        let isCurrent = curP.matrixId == p.matrixId;
+        let cardSelector = this.props.cardSelector;
+        let expanded = this.props.expanded;
+        let gameStateHistory = this.props.gameStateHistory;
 
-function PlayerBox(props) {
-    let p = props.player;
-    let curP = props.currentPlayer;
-    let gs = props.gs;
-    let isCurrent = curP.matrixId == p.matrixId;
-    let cardSelector = props.cardSelector;
-    let expanded = props.expanded;
-    let gameStateHistory = props.gameStateHistory;
-
-    let handCards = createCardIdArray(p.handCards, p.handSize, false);
-    let yourPlayer = p.matrixId == props.thisPlayerMatrixId;
-    let idLabel = p.matrixId;
-    if (yourPlayer) {
-        expanded = true;
-        idLabel = <>You: <b>{idLabel}</b></>;
-    }
-    let playerInfo = <div>
-        <div className={"playerInfo"}>
-            <div style={{ flexGrow: 1 }}>
-                <p>Money: <b>{p.money}</b> </p>
-                <p>Points: <b>{p.points}</b></p>
+        let handCards = createCardIdArray(p.handCards, p.handSize, false);
+        let yourPlayer = (p.matrixId == this.props.thisPlayerMatrixId);
+        let value = this.context;
+        let member = value.roomMembers[p.matrixId];
+        if (yourPlayer) {
+            expanded = true;
+        }
+        const style = {backgroundImage: `url(${member.avatar_url})`};
+        const memberLabel = <>
+            <div class={"avatar"} style={style} />
+            <b>{member.displayname}</b>
+        </>;
+        const playerInfo = <div>
+            <div className={"playerInfo"}>
+                <div style={{ flexGrow: 1 }}>
+                    <p>Money: <b>{p.money}</b> </p>
+                    <p>Points: <b>{p.points}</b></p>
+                </div>
+                <div className={"StartPhaseIndicatorContainer"}>
+                    {p.startPhases.map(phase => <StartPhaseIndicator phase={phase} key={phase} />)}
+                </div>
             </div>
-            <div className={"StartPhaseIndicatorContainer"}>
-                {p.startPhases.map(phase => <StartPhaseIndicator phase={phase} key={phase} />)}
-            </div>
-        </div>
-    </div >
-    const lastActionForPlayer = p.lastTurn(gameStateHistory) ?? {turn: null, prevState: null};
-    const highlightedCardId = lastActionForPlayer?.turn?.cardId;
-    const playerField = <CardFieldRow
-        className={"playerField"}
-        currentPlayer={curP}
-        gs={gs}
-        cardIds={p.getSortedField()}
-        onCardActivate={props.onCardActivate}
-        cardSelector={cardSelector}
-        cardOwnerPlayer={p}
-        showCardIds={props.showCardIds}
-        highlightedCardId={highlightedCardId}
-    />
-    return <div style={{ position: "relative" }} className={"playerBox"+(isCurrent ? " current" : "")+(expanded?" expanded":"")}>
-        <p>{idLabel} <TurnDrawer turn={lastActionForPlayer.turn} prevState={lastActionForPlayer.prevState}></TurnDrawer></p>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-            {playerInfo}
-
-            <CardFieldRow 
-            className={"hand"} 
-            currentPlayer={curP} 
-            gs={gs} 
-            cardIds={handCards} 
-            onCardBuy={props.onCardBuy} 
-            cardSelector={cardSelector} 
-            showCardIds={props.showCardIds} h
+        </div >
+        const lastActionForPlayer = p.lastTurn(gameStateHistory) ?? { turn: null, prevState: null };
+        const highlightedCardId = lastActionForPlayer?.turn?.cardId;
+        const playerField = <CardFieldRow
+            className={"playerField"}
+            currentPlayer={curP}
+            gs={gs}
+            cardIds={p.getSortedField()}
+            onCardActivate={this.props.onCardActivate}
+            cardSelector={cardSelector}
+            cardOwnerPlayer={p}
+            showCardIds={this.props.showCardIds}
             highlightedCardId={highlightedCardId}
-            />
-            {!expanded && playerField}
+        />
+        return <div style={{ position: "relative" }} className={"playerBox" + (isCurrent ? " current" : "") + (expanded ? " expanded" : "")}>
+            <p>{memberLabel} <TurnDrawer turn={lastActionForPlayer.turn} prevState={lastActionForPlayer.prevState}></TurnDrawer></p>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+                {playerInfo}
+
+                <CardFieldRow
+                    className={"hand"}
+                    currentPlayer={curP}
+                    gs={gs}
+                    cardIds={handCards}
+                    onCardBuy={this.props.onCardBuy}
+                    cardSelector={cardSelector}
+                    showCardIds={this.props.showCardIds} h
+                    highlightedCardId={highlightedCardId}
+                />
+                {!expanded && playerField}
+            </div>
+            {expanded && playerField}
         </div>
-        {expanded && playerField}
-    </div>
+    }
 }
+PlayerBox.contextType = StPetersburgContext;
 
 function ControlElement(props) {
     return <div style={{ display: "flex", flexDirection: "row" }}>
         <button disabled={!props.onPassClick} style={{ flexGrow: 1 }} onClick={props.onPassClick}>Pass</button>
-        <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>{ props.showGameStateHistory ? "Gameplay View" : "History View" }</button>
-        <button style={{ flexGrow: 0, backgroundColor:"white", color:"grey" }} onClick={props.onEndClicked}>End Game</button>
+        <button style={{ flexGrow: 1 }} onClick={props.onHistoryViewClick}>{props.showGameStateHistory ? "Gameplay View" : "History View"}</button>
+        <button style={{ flexGrow: 0, backgroundColor: "white", color: "grey" }} onClick={props.onEndClicked}>End Game</button>
     </div>;
 }
 class GameField extends Component {
@@ -172,11 +181,11 @@ class GameField extends Component {
         super(props);
     }
     componentDidMount() { }
-    static letUserSelectExchangeCradId(cardId, currentPlayer, gameState){
-        const p = new Promise((resolve)=>{
+    static letUserSelectExchangeCradId(cardId, currentPlayer, gameState, skipFieldCheck) {
+        const p = new Promise((resolve) => {
             if (!currentPlayer) { console.log("EEEEEEEE currentPlayer is undefined") }
             let possibleUpgrades = currentPlayer.getPossibleUpgradesForCard(cardId);
-            let possiblePayableUpgrades = possibleUpgrades.filter((c) => currentPlayer.canBuyCard(cardId, gameState, c));
+            let possiblePayableUpgrades = possibleUpgrades.filter((c) => currentPlayer.canBuyCard(cardId, gameState, c, skipFieldCheck));
             window.Actions.selectCard(possiblePayableUpgrades).then(
                 (selectedCard) => {
                     resolve(selectedCard)
@@ -206,7 +215,7 @@ class GameField extends Component {
                 cardId: cardId
             }
             if (card.category == CardCategory.Exchange) {
-                GameField.letUserSelectExchangeCradId(cardId, curP, gs).then( (selectedCard)=>{
+                GameField.letUserSelectExchangeCradId(cardId, curP, gs).then((selectedCard) => {
                     turn["exchangeCardId"] = selectedCard;
                     this.props.onTurn(turn);
                 })
@@ -231,7 +240,7 @@ class GameField extends Component {
             this.props.onTurn(turn);
         }
         let onCardActivate = (cardId) => {
-            Cards.byId(cardId).getActionPayload(gs).then((payload)=>{
+            Cards.byId(cardId).getActionPayload(gs).then((payload) => {
                 let turn = {
                     type: TurnType.ActivateCard,
                     cardId: cardId,
@@ -251,18 +260,18 @@ class GameField extends Component {
 
         return (
             <>
-                <div className={'field' + (yourTurn ? ' yourTurn' : '') + " "+(CardCategory.label(gs.phase))} >
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardIds={this.props.showCardIds}/>
-                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardIds={this.props.showCardIds}/>
+                <div className={'field' + (yourTurn ? ' yourTurn' : '') + " " + (CardCategory.label(gs.phase))} >
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={topCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardIds={this.props.showCardIds} />
+                    <CardFieldRow currentPlayer={curP} gs={gs} cardIds={botCards} onCardTake={onCardTake?.bind(this)} onCardBuy={onCardBuy?.bind(this)} cardSelector={cardSelector} showCardIds={this.props.showCardIds} />
                 </div>
                 <ControlElement
-                        onPassClick={onPass}
-                        onEndClicked={this.props.onEnd}
-                        showGameStateHistory={this.props.showGameStateHistory}
-                        onHistoryViewClick={this.props.onHistoryToggle}
-                    />
+                    onPassClick={onPass}
+                    onEndClicked={this.props.onEnd}
+                    showGameStateHistory={this.props.showGameStateHistory}
+                    onHistoryViewClick={this.props.onHistoryToggle}
+                />
                 <div className={'playerArea'} style={{ display: "flex" }}>
-                    {gs.players.map((p) => {
+                    {rotatedArrayForPlayer(gs.players, this.props.userId).map((p) => {
                         return <PlayerBox
                             key={p.matrixId}
                             player={p}

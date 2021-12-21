@@ -9,7 +9,7 @@ export function StartGamePage(props) {
     return <div style={{ padding: "10px" }}>
         {(gameState.isGameOver) &&
             <div>
-                {gameState.isCancelled() && <>The game got cancelld. Start a new one!</>}
+                {gameState.isCancelled() && <>The game got cancelled. Start a new one!</>}
                 {(gameState.isPlayedToEnd) &&
                     <> The game is over, the winner is: <br />
                         {gameState?.players?.sort((a, b) => a.points - b.points).length > 0
@@ -21,16 +21,18 @@ export function StartGamePage(props) {
             </div>
         }
         <div><button onClick={initializeGame}>Start Game</button></div>
-        {roomMembers.map((m) =>
-            <p key={m} ><label>
+        {Object.keys(roomMembers).map((matrixId) => { 
+            let member = roomMembers[matrixId]
+            return <p key={member.matrixId} ><label>
                 <input
-                    name={m}
+                    name={matrixId}
                     type={"checkbox"}
-                    onChange={onChange.bind(null, m)}
-                    checked={selectedRoomMember.has(m)}
+                    onChange={onChange.bind(null, matrixId)}
+                    checked={selectedRoomMember.has(matrixId)}
                 />
-                {m}
+                {member.displayname}
             </label></p>
+            }
         )}
     </div>
 }

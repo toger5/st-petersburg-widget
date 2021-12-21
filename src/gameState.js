@@ -245,7 +245,7 @@ export class GameState {
                         p.pointsFinalAristocrats = gs.players[pIndex].points - prevGs.players[pIndex].points;
                         p.countFinalAristocrats = gs.players[pIndex].aristocratsCount();
                         p.countFinalHandCards = gs.players[pIndex].handCards.length;
-                        p.pointsFinalHandCards = -5 * p.pointsFinalHandCards;
+                        p.pointsFinalHandCards = -5 * p.countFinalHandCards;
                         p.pointsFromMoney = Math.floor(gs.players[pIndex].money / 10);
                         p.money = gs.players[pIndex].money;
                     }
@@ -283,7 +283,7 @@ export class Player {
     get handSize() { return this.field.map(c => Cards.byId(c).type).includes(CardIndex.CardType.WareHouse) ? 4 : 3 };
     field = [];
     startPhases = [];
-    disabledCards = []
+    disabledCards = [];
     getSortedField() {
         return [...this.field].sort((cIdA, cIdB) => {
             const [cA, cB] = [Cards.byId(cIdA), Cards.byId(cIdB)]
@@ -294,11 +294,13 @@ export class Player {
     }
     phaseEvalutation(gameState) {
         if (gameState.phase == CardCategory.Exchange) return;
-        let cardsToEvaluate = this.field
-            .map((cardId) => { return Cards.byId(cardId) })
-            .filter((card) => {
-                return card.category === gameState.phase || card.upgradeCategory === gameState.phase
-            });
+        let cardsToEvaluate = this.field.filter(
+            (cardId) => !this.disabledCards.includes(cardId)
+        ).map((cardId) => {
+            return Cards.byId(cardId)
+        }).filter((card) => {
+            return card.category === gameState.phase || card.upgradeCategory === gameState.phase
+        })
         let m = 0;
         let p = 0;
         for (let c of cardsToEvaluate) {

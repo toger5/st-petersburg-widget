@@ -9,15 +9,15 @@ export function shuffle(array, seed) {
   }
 
   //sort cheat to make specific cards easier to get.
-  if (false) {
+  if (true) {
     let foundOne = false;
     const obs_IDs = [28 + 29, 28 + 30]
     const marinsky_IDs = [99]
-    for (const obsId of marinsky_IDs) {
+    for (const obsId of obs_IDs) {
       if (shuffleArr.includes(obsId) && !foundOne) {
         let indexOfObs = shuffleArr.indexOf(obsId);
         if (indexOfObs != -1) {
-          shuffleArr.splice(indexOfObs, 1)[0]
+          shuffleArr.splice(indexOfObs, 1)
           shuffleArr.unshift(obsId)
           foundOne = true;
         }
@@ -68,4 +68,17 @@ function isObject(object) {
 
 export function getKeyByValue(object, value) {
   return Object.keys(object).find(key => object[key] === value);
+}
+
+
+export function rotatedArrayForPlayer(arr, matrixId){
+  let arrCopy = [...arr];
+  if(!arr.map((p)=>p.matrixId).includes(matrixId)){
+      console.error("Trying to rotate player list with user: ", matrixId, " who is not part of that list");
+      return;
+  }
+  for(let i = 0; arrCopy[0].matrixId != matrixId; i++){
+      arrCopy.push(arrCopy.shift());
+  }
+  return arrCopy;
 }

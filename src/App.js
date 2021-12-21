@@ -12,6 +12,9 @@ import "./PubActivationSelector.css"
 import "./loader.css"
 import { deepEqual } from './helper'
 import { CardCategory } from "./cards";
+import { StPetersburgContext } from "./context";
+import { getHttpUriForMxc } from "./mxcToHttp"
+
 const stringHash = require("string-hash");
 
 const NOTIFY = true;
@@ -30,15 +33,15 @@ class App extends Component {
             selectActionTypeForCard: this.selectActionTypeForCard.bind(this),
             selectCard: this.selectCard.bind(this),
             selectPubActivationCount: this.selectPubActivationCount.bind(this),
-            setAppState: (newState)=>{this.setState(newState)},
-            toggleSetting: (setting)=>{
+            setAppState: (newState) => { this.setState(newState) },
+            toggleSetting: (setting) => {
                 let newState = {}
                 newState[setting] = !this.state[setting];
                 this.setState(newState)
             }
         }
         this.state = {
-            roomMembers: [],
+            roomMembers: {},
             selectedRoomMember: new Set(),
             gameState: new GameState(),
             yourTurn: false,
@@ -71,9 +74,9 @@ class App extends Component {
                     // this is the only next event that is accepted by other clients
                     // this.state.previousEvent = ev.detail.data.unsigned.prev_content
                     // this.prev_gameState = App.cloneGameState(this.state.gameState);
-                    if(ev.detail.data.state_key == this.props.widgetId){
+                    if (ev.detail.data.state_key == this.props.widgetId) {
                         this.handleStPetersburgEvent(ev.detail.data)
-                    }else{
+                    } else {
                         console.log("ignore stPetersburg events form other widgets in this room")
                     }
                     break;
@@ -82,11 +85,24 @@ class App extends Component {
         })
         this.widgetApi.readStateEvents(
             "m.room.member",
-            25,
+            100,
         ).then((events) => {
-            let roomMembers = events.map(ev => ev.state_key);
+            let roomMembers = events.map(ev => ({
+                matrixId: ev.state_key,
+                avatar_url: getHttpUriForMxc("https://matrix-client.matrix.org", ev.content.avatar_url, 40, 40, "scale"),
+                displayname: ev.content.displayname,
+                membership: ev.content.membership,
+            })).filter(
+                (member)=>(member.membership == "join")
+            ).reduce(
+                (obj, member) => {obj[member.matrixId] = member; return obj},
+                {}
+            );
             console.log('read member: ', roomMembers)
-            this.setState({ selectedRoomMember: new Set(roomMembers), roomMembers: roomMembers })
+            this.setState({
+                selectedRoomMember: new Set(Object.keys(roomMembers)),
+                roomMembers: roomMembers,
+            })
         });
         this.widgetApi.readStateEvents(
             ST_PETERSBURG_EVENT_NAME,
@@ -115,48 +131,48 @@ class App extends Component {
             "msgtype": "m.text",
             "body": "🕍 " + gameState.getCurrentPlayer().matrixId + " It's your turn!\n_Sent from the St. Petersburg Widget_",
             "format": "org.matrix.custom.html",
-            "formatted_body": "🕍 <a href=\"https://matrix.to/#/"+gameState.getCurrentPlayer().matrixId+"\">"+gameState.getCurrentPlayer().matrixId+"</a> It's your turn!<br><em>Sent from the St. Petersburg Widget</em>"
+            "formatted_body": "🕍 <a href=\"https://matrix.to/#/" + gameState.getCurrentPlayer().matrixId + "\">" + gameState.getCurrentPlayer().matrixId + "</a> It's your turn!<br><em>Sent from the St. Petersburg Widget</em>"
         }
-        if(gameState.isPlayedToEnd){
+        if (gameState.isPlayedToEnd) {
             let summary = GameState.gameSummary(startState, gameState.turns)
-            let summaryPlayerTextList = summary.playerSummaries.map((p,i) =>
-            "<strong>"+(i+1)+". Place <a href=\"https://matrix.to/#/"+summary.playerSummaries[i].matrixId+"\">"+summary.playerSummaries[i].matrixId+"</a></strong>\n"+
-            "<p>with <strong>"+p.points+"</strong> points:</p>\n"+
-            "<ul>"+
-            "<li><strong>Final settlement:</strong>\n"+
-                "<ul>"+
-                    "<li>Aristocrats ("+p.countFinalAristocrats+"): "+p.pointsFinalAristocrats+" Point/s</li>"+
-                    "<li>Rubel ("+p.money+"): "+p.pointsFromMoney+" Point/s</li>"+
-                    "<li>Hand Cards ("+p.countFinalHandCards+"): "+p.pointsFinalHandCards+" Point/s</li>"+
-                "</ul>"+
-            "</li>\n"+
-            "<li><strong>Worker</strong>: "+p.pointsWorker+ " Point/s</li>\n"+
-            "<li><strong>Buildings</strong>: "+p.pointsBuildings+" Point/s</li>\n"+
-            "<li><strong>Aristocrats</strong>: "+p.pointsAristocrats+" Point/s</li>"+
-            "</ul>")
+            let summaryPlayerTextList = summary.playerSummaries.map((p, i) =>
+                "<strong>" + (i + 1) + ". Place <a href=\"https://matrix.to/#/" + summary.playerSummaries[i].matrixId + "\">" + summary.playerSummaries[i].matrixId + "</a></strong>\n" +
+                "<p>with <strong>" + p.points + "</strong> points:</p>\n" +
+                "<ul>" +
+                "<li><strong>Final settlement:</strong>\n" +
+                "<ul>" +
+                "<li>Aristocrats (" + p.countFinalAristocrats + "): " + p.pointsFinalAristocrats + " Point/s</li>" +
+                "<li>Rubel (" + p.money + "): " + p.pointsFromMoney + " Point/s</li>" +
+                "<li>Hand Cards (" + p.countFinalHandCards + "): " + p.pointsFinalHandCards + " Point/s</li>" +
+                "</ul>" +
+                "</li>\n" +
+                "<li><strong>Worker</strong>: " + p.pointsWorker + " Point/s</li>\n" +
+                "<li><strong>Buildings</strong>: " + p.pointsBuildings + " Point/s</li>\n" +
+                "<li><strong>Aristocrats</strong>: " + p.pointsAristocrats + " Point/s</li>" +
+                "</ul>")
             roomNotifyContent = {
                 "msgtype": "m.text",
                 "body": "🕍 " + gameState.getCurrentPlayer().matrixId + " It's your turn!\n_Sent from the St. Petersburg Widget_",
                 "format": "org.matrix.custom.html",
-                "formatted_body": 
-                "🕍 The Game is Over:<br>" +
-                "Congratulations to <a href=\"https://matrix.to/#/"+summary.playerSummaries[0].matrixId+"\">"+summary.playerSummaries[0].matrixId+"</a>, who <strong>won the game.</strong><br><br>"+
-                summaryPlayerTextList.join("") +
-                "<br><em>Sent from the St. Petersburg Widget</em>"
+                "formatted_body":
+                    "🕍 The Game is Over:<br>" +
+                    "Congratulations to <a href=\"https://matrix.to/#/" + summary.playerSummaries[0].matrixId + "\">" + summary.playerSummaries[0].matrixId + "</a>, who <strong>won the game.</strong><br><br>" +
+                    summaryPlayerTextList.join("") +
+                    "<br><em>Sent from the St. Petersburg Widget</em>"
             }
         }
         this.widgetApi.sendStateEvent(ST_PETERSBURG_EVENT_NAME, this.props.widgetId, content);
         if (LOGGING) this.widgetApi.sendRoomEvent("m.room.message", roomMessageContent, "");
         if (NOTIFY) this.widgetApi.sendRoomEvent("m.room.message", roomNotifyContent, "");
     }
-    sendCheatAlert(cheatMessages, sender){
+    sendCheatAlert(cheatMessages, sender) {
         let cheatErrorList = cheatMessages.map(err => "\n" + err.msg + "\n" + err.details)
-        let cheatErrorListFormatted = cheatMessages.map(err => "<br><strong>" + err.msg + "</strong><br><em>" + err.details+"</em>")
+        let cheatErrorListFormatted = cheatMessages.map(err => "<br><strong>" + err.msg + "</strong><br><em>" + err.details + "</em>")
         let roomCheatAlert = {
             "msgtype": "m.text",
-            "body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>"+cheatErrorList+"\n_Sent from the St. Petersburg Widget_",
+            "body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>" + cheatErrorList + "\n_Sent from the St. Petersburg Widget_",
             "format": "org.matrix.custom.html",
-            "formatted_body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>"+cheatErrorListFormatted+"<br><em>Sent from the St. Petersburg Widget</em>",
+            "formatted_body": "🕍 I think, that " + sender + " cheated!<br>Those are my suspicions:<br>" + cheatErrorListFormatted + "<br><em>Sent from the St. Petersburg Widget</em>",
         }
         this.widgetApi.sendRoomEvent("m.room.message", roomCheatAlert, "");
     }
@@ -195,7 +211,7 @@ class App extends Component {
         });
         return promise;
     }
-    selectDeck(){
+    selectDeck() {
         let promise = new Promise((deckSelected) => {
             let deckSelector = {
                 onSelect: (deckCategory) => {
@@ -216,9 +232,9 @@ class App extends Component {
             let actionTypeSelector = {
                 cardId: cardId,
                 onSelect: (actionType, _cardId) => {
-                    actionTypeSelected(actionType)
+                    actionTypeSelected(actionType);
                     this.setState({
-                        actionTypeSelector: null,
+                        actionTypeSelector: undefined,
                     })
                 }
             }
@@ -253,7 +269,7 @@ class App extends Component {
         gameStateB.players = gameStateB.players.map((p) => {
             let pl = new Player();
             return Object.assign(pl, p);
-        }) 
+        })
         return gameStateB;
     }
     handleStPetersburgEvent(evData) {
@@ -294,12 +310,12 @@ class App extends Component {
 
         // HISTORY:
         let history;
-        if(!this.state.gameStateHistory){
+        if (!this.state.gameStateHistory) {
             history = GameState.createGameStateHistory(startState, newGs.turns);
         } else {
             history = this.state.gameStateHistory.concat(App.cloneGameState(newGs));
         }
-        
+
         this.startState = startState;
         this.setState({
             lockUI: false,
@@ -313,14 +329,14 @@ class App extends Component {
         let cheatMessages = [];
 
         // check that start state was not altered:
-        if(previousStartState){
-            if(startState.getHash() != previousStartState.getHash()){
+        if (previousStartState) {
+            if (startState.getHash() != previousStartState.getHash()) {
                 cheatMessages.push({
                     msg: "A user changed the start state.",
                     details: "Changing the startState of the game makes it impossible reconstruct the game. As a consequence the history view wont work. And most likely someone cheated or there is a bug."
                 })
             }
-        }else{
+        } else {
             console.log("could not check start state, this is the first even received with this session so the prev start state could not be stored.")
         }
         // check that the correct player sended:
@@ -372,29 +388,29 @@ class App extends Component {
             selectedRoomMember: newSet
         })
     }
-    toggleHistoryView(isInHistoryView){
+    toggleHistoryView(isInHistoryView) {
         console.log("gameStateHistory", this.state.gameStateHistory)
-        if(isInHistoryView){
+        if (isInHistoryView) {
             this.setState({
                 showGameStateHistory: false,
             })
-        }else{
+        } else {
             this.setState({
                 gameStateHistoryIndex: Math.max(this.state.gameStateHistory.length - 1, 0),
                 showGameStateHistory: true,
             })
         }
     }
-    nextHistory(){
+    nextHistory() {
         const newIndex = this.state.gameStateHistoryIndex + 1;
-        if(newIndex < this.state.gameStateHistory.length){
-            this.setState({gameStateHistoryIndex: newIndex});
+        if (newIndex < this.state.gameStateHistory.length) {
+            this.setState({ gameStateHistoryIndex: newIndex });
         }
     }
-    prevHistory(){
+    prevHistory() {
         const newIndex = this.state.gameStateHistoryIndex - 1;
-        if(newIndex >= 0){
-            this.setState({gameStateHistoryIndex: newIndex});
+        if (newIndex >= 0) {
+            this.setState({ gameStateHistoryIndex: newIndex });
         }
     }
     render() {
@@ -415,9 +431,9 @@ class App extends Component {
             game =
                 <div>
                     <div>
-                        <GameHeader phase={gs.phase} cards={gs.cards}/><div className="version">version {process.env.PACKAGE_VERSION}</div>
+                        <GameHeader phase={gs.phase} cards={gs.cards} /><div className="version">version {process.env.PACKAGE_VERSION}</div>
                     </div>
-                    {!this.state.showGameStateHistory && 
+                    {!this.state.showGameStateHistory &&
                         <GameField
                             history={this.state.gameStateHistory}
                             gameState={gs}
@@ -450,12 +466,12 @@ class App extends Component {
                     }
 
                     {/* Selectors */}
-                    {this.state.pubSelector && <PubActivationSelector pubSelector={this.state.pubSelector}/>}
-                    {this.state.deckSelector && <DeckSelector deckSelector={this.state.deckSelector} cards={this.state.gameState.cards}/>}
-                    {this.state.actionTypeSelector && <ActionTypeSelector actionTypeSelector={this.state.actionTypeSelector} gameState={this.state.gameState}/>}
-                    
+                    {this.state.pubSelector && <PubActivationSelector pubSelector={this.state.pubSelector} />}
+                    {this.state.deckSelector && <DeckSelector deckSelector={this.state.deckSelector} cards={this.state.gameState.cards} />}
+                    {this.state.actionTypeSelector && <ActionTypeSelector actionTypeSelector={this.state.actionTypeSelector} gameState={this.state.gameState} />}
+
                     {(/*you can not cancel actionTypeSelector*/this.state.pubSelector || this.state.deckSelector || this.state.cardSelector) &&
-                        <button class="CancelButton" onClick={()=>{this.setState({cardSelector:null, pubSelector:null,deckSelector:null, actionTypeSelector:null})}}>
+                        <button class="CancelButton" onClick={() => { this.setState({ cardSelector: null, pubSelector: null, deckSelector: null, actionTypeSelector: null }) }}>
                             Cancel
                         </button>
                     }
@@ -465,10 +481,12 @@ class App extends Component {
         }
         let lock = this.state.lockUI;
         return (
-            <div className={"App"} style={{pointerEvents: lock ? "none": "auto"}}>
-                {lock && <div className={"LoadingIndicator"}><div className={"loader"}></div></div>}
-                {game || startGamePage}
-            </div>
+            <StPetersburgContext.Provider value={{ roomMembers: this.state.roomMembers }}>
+                <div className={"App"} style={{ pointerEvents: lock ? "none" : "auto" }}>
+                    {lock && <div className={"LoadingIndicator"}><div className={"loader"}></div></div>}
+                    {game || startGamePage}
+                </div>
+            </StPetersburgContext.Provider>
         );
     }
 }
@@ -477,8 +495,8 @@ function GameHeader(props) {
     let classNames = ["Worker", "Building", "Aristocrat", "Exchange"];
     let phases = [CardCategory.Worker, CardCategory.Building, CardCategory.Aristocrat, CardCategory.Exchange]
     return <div className={"GameHeader"}>
-        {phases.map(p =>{
-            return <div key={p} className={classNames[p]+" "+(props.phase == p ? "current":"")}>
+        {phases.map(p => {
+            return <div key={p} className={classNames[p] + " " + (props.phase == p ? "current" : "")}>
                 <p>{props.cards[p].length}</p>
             </div>
         })}
@@ -486,55 +504,55 @@ function GameHeader(props) {
 }
 
 
-function PubActivationSelector(props){
+function PubActivationSelector(props) {
     let pSelector = props.pubSelector;
     return <div className={"PubActivationSelector"}>
         <p>Select how often to use your pub:</p>
-    {Array.from(Array(pSelector.possibleActivations).keys()).map(i => {
-        let count = i+1;
-        return <button key={i} onClick={pSelector.onSelect.bind(null, count)}>{count*2+" Rubel -> "+count+" Points"}</button>
-    })}
+        {Array.from(Array(pSelector.possibleActivations).keys()).map(i => {
+            let count = i + 1;
+            return <button key={i} onClick={pSelector.onSelect.bind(null, count)}>{count * 2 + " Rubel -> " + count + " Points"}</button>
+        })}
     </div>
 }
 
-function DeckSelector(props){
+function DeckSelector(props) {
     let selector = props.deckSelector;
-    const options = [{label: "Worker", category: CardCategory.Worker},
-        {label: "Building", category: CardCategory.Building},
-        {label: "Aristocrat", category: CardCategory.Aristocrat},
-        {label: "Exchange", category: CardCategory.Exchange}];
+    const options = [{ label: "Worker", category: CardCategory.Worker },
+    { label: "Building", category: CardCategory.Building },
+    { label: "Aristocrat", category: CardCategory.Aristocrat },
+    { label: "Exchange", category: CardCategory.Exchange }];
     return <div className={"DeckSelector"}>
         {options.map(op => {
-            return <button disabled={props.cards[op.category].length <= 0} onClick={selector.onSelect.bind(null, op.category)} className={op.label+" DeckCategoryButton"}>
+            return <button disabled={props.cards[op.category].length <= 0} onClick={selector.onSelect.bind(null, op.category)} className={op.label + " DeckCategoryButton"}>
                 {op.label}<span>({props.cards[op.category].length})</span>
-                </button>
+            </button>
         })}
-        </div>
+    </div>
 }
 export const ActionType = {
     Buy: "buy",
     Take: "take",
     Discard: "discard",
 }
-function ActionTypeSelector(props){
+function ActionTypeSelector(props) {
     const selector = props.actionTypeSelector;
     const curP = props.gameState.getCurrentPlayer();
 
     let onBuy = selector.onSelect.bind(null, ActionType.Buy);
     let onTake = selector.onSelect.bind(null, ActionType.Take);
     let onDiscard = selector.onSelect.bind(null, ActionType.Discard);
-    
+
     return <div className={"DeckSelector ActionTypeSelector"}>
-            <Card 
-                cardId={selector.cardId} 
-                onCardBuy={onBuy}
-                onCardTake={onTake}
-                onCardDiscard={onDiscard}
-                skipFieldChecks={true}
-                currentPlayer={curP}
-                gs={props.gameState}
-            />
-        </div>
+        <Card
+            cardId={selector.cardId}
+            onCardBuy={onBuy}
+            onCardTake={onTake}
+            onCardDiscard={onDiscard}
+            skipFieldChecks={true}
+            currentPlayer={curP}
+            gs={props.gameState}
+        />
+    </div>
 }
 
 export default App;

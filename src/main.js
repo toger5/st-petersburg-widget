@@ -48,6 +48,18 @@ api.requestCapabilityForRoomTimeline(ST_PETERSBURG_AUTH_ROOMID);
 //     api.transport.reply(ev.detail, {custom: "reply"});
 // });
 
+// TODO
+// [x] fix order of players (you are always on top)
+// [x] show activated card when activating observatory
+// [ ] highlight actiaved card when activating observatory
+// [ ] show money from player evaluation (next to points/ money or in last turn element)
+// [ ] show card on hover (bottom right if overed card is on top, top right otherwise)
+// [ ] change dark theme backgorund of field
+// [ ] buy upgraded from obs
+// [x] disable upgrading on disabled cards
+// [ ] show how often pub got activated in last turn
+// [x] use content from membership event for display name and joined state.
+
 export function tryAuthentication() {
     console.log("try to autheticate")
     api.readStateEvents(
