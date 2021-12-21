@@ -6,6 +6,7 @@ const VERSION_OUTPUTS = {
     v0_1_8: 'dist/0.1.8',
     v0_1_9: 'dist/0.1.9',
     v0_2_0: 'dist/0.2.0',
+    v0_2_1: 'dist/0.2.1',
 }
 module.exports = {
     entry: './src/main.js',
