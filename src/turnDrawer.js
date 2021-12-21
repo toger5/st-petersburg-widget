@@ -47,8 +47,7 @@ export function TurnDrawer(props) {
             switch (card.type) {
                 case CardType.Pub:
                     innerElem = <>
-                        <span>Converted <b>{((turn?.payload?.activationCount ?? 0) * 2) + " Rubel"}</b>
-                            to <b>{turn.payload.activationCount} Points</b>
+                        <span>Converted <b>{((turn?.payload?.activationCount ?? 0) * 2) + " Rubel"}</b> to <b>{turn.payload.activationCount} Points</b>
                         </span><CardPreview card={card} />
                     </>;
                     break;
@@ -65,7 +64,7 @@ export function TurnDrawer(props) {
                     innerElem = <>Activated Observatory: {actionText} <CardPreview card={Cards.byId(randomCardId)} /></>; 
                 break;
             }
-            elem = <div>🎆{innerElem}</div>;
+            elem = <div>🎆 {innerElem}</div>;
             break;
     }
     return <div className="turnDrawer">{elem}</div>;

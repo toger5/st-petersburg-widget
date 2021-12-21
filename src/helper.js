@@ -8,12 +8,13 @@ export function shuffle(array, seed) {
     shuffleArr.push(arrayCopy.splice(index, 1)[0]);
   }
 
-  //sort cheat to make specific cards easier to get.
-  if (true) {
+  //sort cheat to make specific cards easier to get. (this is used for debugging/testing.)
+  if (false) {
     let foundOne = false;
     const obs_IDs = [28 + 29, 28 + 30]
-    const marinsky_IDs = [99]
-    for (const obsId of obs_IDs) {
+    const marinsky_IDs = [99];
+    const pub_IDs = [54,55];
+    for (const obsId of pub_IDs) {
       if (shuffleArr.includes(obsId) && !foundOne) {
         let indexOfObs = shuffleArr.indexOf(obsId);
         if (indexOfObs != -1) {

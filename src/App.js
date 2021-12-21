@@ -3,7 +3,7 @@ import { WidgetApiToWidgetAction } from 'matrix-widget-api'
 import {
     ST_PETERSBURG_EVENT_NAME,
 } from './main'
-import { GameState, Player, getGameState, TurnType } from './gameState'
+import { GameState, Player, TurnType } from './gameState'
 import GameField, { Card } from './gameField'
 import { StartGamePage } from "./StartGamePage"
 import "./App.css"
@@ -275,7 +275,7 @@ class App extends Component {
     handleStPetersburgEvent(evData) {
         let newGs = App.cloneGameState(evData.content.gameState);
         const startState = App.cloneGameState(evData.content.startState);
-        // newGs.seed = // will be set accodingly depending on newGs.turns.length != 0
+        // newGs.seed = // will be set accordingly depending on newGs.turns.length != 0
         newGs.sender = evData.sender;
 
         if (newGs.turns.length != 0 && !newGs.isGameOver) {

@@ -72,7 +72,7 @@
     border-style: solid
 }
 .playerBox p{
-    margin: 3px 0;
+    margin: 2px 0 3px 2px;
 }
 .playerInfo{
     display: flex;
@@ -80,7 +80,8 @@
     width: 70px;
 }
 .playerInfo p{
-    margin: 8px 0; 
+    margin-top: 8px; 
+    margin-bottom: 8px;
 }
 
 .StartPhaseIndicatorContainer {
