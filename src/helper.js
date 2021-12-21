@@ -76,7 +76,7 @@ export function rotatedArrayForPlayer(arr, matrixId){
   let arrCopy = [...arr];
   if(!arr.map((p)=>p.matrixId).includes(matrixId)){
       console.error("Trying to rotate player list with user: ", matrixId, " who is not part of that list");
-      return;
+      return arrCopy;
   }
   for(let i = 0; arrCopy[0].matrixId != matrixId; i++){
       arrCopy.push(arrCopy.shift());
