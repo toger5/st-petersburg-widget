@@ -156,7 +156,7 @@ class App extends Component {
                 "format": "org.matrix.custom.html",
                 "formatted_body":
                     "🕍 The Game is Over:<br>" +
-                    "Congratulations to <a href=\"https://matrix.to/#/" + summary.playerSummaries[0].matrixId + "\">" + summary.playerSummaries[0].matrixId + "</a>, who <strong>won the game.</strong><br><br>" +
+                    "Congratulations to <a href=\"https://matrix.to/#/" + summary.playerSummaries[0].matrixId + "\">" + summary.playerSummaries[0].matrixId + "</a>, who <strong>won the game.</strong> 🎉<br><br>" +
                     summaryPlayerTextList.join("") +
                     "<br><em>Sent from the St. Petersburg Widget</em>"
             }
