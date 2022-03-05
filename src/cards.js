@@ -395,7 +395,7 @@ cardsByType.set(CardType.MarinksyTheater, {
     image: "https://www.yucata.de/Games/SaintPetersburg2/images/exchange_marinsky_EN.jpg",
     price:15,
     points: (player) => {
-        let redCards = player.field.filter( c => Cards.byId(c).category == CardCategory.Aristocrat);
+        let redCards = player.field.filter( c => Cards.byId(c).category == CardCategory.Aristocrat || (Cards.byId(c).category == CardCategory.Exchange && Cards.byId(c).upgradeCategory == CardCategory.Aristocrat));
         return redCards.length;
     },
     money:0,

@@ -59,7 +59,7 @@ api.requestCapabilityForRoomTimeline(ST_PETERSBURG_AUTH_ROOMID);
 // [x] disable upgrading on disabled cards
 // [ ] show how often pub got activated in last turn
 // [x] use content from membership event for display name and joined state.
-
+// [ ] observatory is cancellable if you click buy on upgrade.
 export function tryAuthentication() {
     console.log("try to autheticate")
     api.readStateEvents(
