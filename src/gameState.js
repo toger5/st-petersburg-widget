@@ -225,18 +225,19 @@ export class GameState {
             if (i > 1) { prevGs = history[i - 1]; }
             if (prevGs) {
                 for (const [pIndex, p] of playerSummaries.entries()) {
-                    if (prevGs.phase != gs.phase && !gs.isGameOver) {
+                    if (!gs.isGameOver) {
+                        const moneyFactor = prevGs.phase == gs.phase ? 0 : 1;
                         switch (prevGs.phase) {
                             case CardCategory.Worker:
-                                p.moneyWorker += gs.players[pIndex].money - prevGs.players[pIndex].money;
+                                p.moneyWorker += (gs.players[pIndex].money - prevGs.players[pIndex].money) * moneyFactor;
                                 p.pointsWorker += gs.players[pIndex].points - prevGs.players[pIndex].points;
                                 break;
                             case CardCategory.Building:
-                                p.moneyBuildings += gs.players[pIndex].money - prevGs.players[pIndex].money;
+                                p.moneyBuildings += (gs.players[pIndex].money - prevGs.players[pIndex].money) * moneyFactor;
                                 p.pointsBuildings += gs.players[pIndex].points - prevGs.players[pIndex].points;
                                 break;
                             case CardCategory.Aristocrat:
-                                p.moneyAristocrats += gs.players[pIndex].money - prevGs.players[pIndex].money;
+                                p.moneyAristocrats += (gs.players[pIndex].money - prevGs.players[pIndex].money) * moneyFactor;
                                 p.pointsAristocrats += gs.players[pIndex].points - prevGs.players[pIndex].points;
                                 break;
                         }
